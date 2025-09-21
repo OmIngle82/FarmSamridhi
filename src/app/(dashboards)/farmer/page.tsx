@@ -84,10 +84,10 @@ export default function FarmerDashboard() {
             <DashboardCard title="Live Market Prices (MSP)" className="xl:col-span-2">
                  <Skeleton className="h-56 w-full" />
             </DashboardCard>
-            <DashboardCard title="Microcredit Options">
+             <DashboardCard title="Microcredit Options" className="xl:col-span-1">
                 <Skeleton className="h-32 w-full" />
             </DashboardCard>
-             <DashboardCard title="Government Schemes">
+             <DashboardCard title="Government Schemes" className="xl:col-span-1">
                 <Skeleton className="h-32 w-full" />
             </DashboardCard>
         </div>
@@ -209,8 +209,10 @@ export default function FarmerDashboard() {
                 <h3 className="font-semibold text-lg">Agri-Loan Express</h3>
                 <p className="text-muted-foreground text-sm mt-1">Get quick loans up to ₹50,000 with minimal paperwork. Competitive interest rates.</p>
             </div>
-            <Button className="mt-4" onClick={() => toast({title: 'Apply Now', description: 'Feature coming soon!'})}>
-                <DollarSign className="mr-2 h-4 w-4" /> Apply Now
+            <Button className="mt-4" asChild>
+                <Link href="/farmer/finances">
+                 <DollarSign className="mr-2 h-4 w-4" /> Apply Now
+                </Link>
             </Button>
         </div>
       </DashboardCard>
@@ -234,7 +236,6 @@ export default function FarmerDashboard() {
             <Link href="/farmer/schemes">View all schemes</Link>
         </Button>
       </DashboardCard>
-
     </div>
   )
 }
