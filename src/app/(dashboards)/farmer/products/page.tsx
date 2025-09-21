@@ -35,7 +35,7 @@ import { useToast } from "@/hooks/use-toast"
 import { addProduct, getProducts, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
 import { suggestProductDetails } from "@/ai/flows/suggest-product-details-flow"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Upload, X, Trash2, Edit, Sparkles } from "lucide-react"
+import { Upload, X, Trash2, Edit, Sparkles, Loader2 } from "lucide-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 const productSchema = z.object({
@@ -127,40 +127,42 @@ function ProductsPageContent() {
   
   useEffect(() => {
     const newProductName = searchParams.get("newProductName");
-    if (newProductName && !suggestionAppliedRef.current) {
-        suggestionAppliedRef.current = true; // Prevents re-running on component re-renders
-        form.setValue("name", newProductName);
-        toast({
-            title: "Add New Product",
-            description: `Generating suggestions for "${newProductName}"...`,
-        });
+    if (newProductName && form.getValues('name') !== newProductName && !isEditing) {
+        if (!suggestionAppliedRef.current) {
+            suggestionAppliedRef.current = true;
+            form.setValue("name", newProductName);
+            toast({
+                title: "Add New Product",
+                description: `Generating suggestions for "${newProductName}"...`,
+            });
 
-        const getSuggestions = async () => {
-            setIsSuggesting(true);
-            try {
-                const suggestions = await suggestProductDetails({ productName: newProductName });
-                form.setValue("description", suggestions.description);
-                form.setValue("image", suggestions.imageUrl);
-                setImagePreview(suggestions.imageUrl);
-                toast({
-                    title: "Suggestions Applied!",
-                    description: "We've filled in a description and image for you.",
-                });
-            } catch (err) {
-                console.error("Failed to get suggestions:", err);
-                toast({
-                    variant: "destructive",
-                    title: "Suggestion Failed",
-                    description: "Could not generate AI suggestions. Please fill in the details manually.",
-                });
-            } finally {
-                setIsSuggesting(false);
-            }
-        };
+            const getSuggestions = async () => {
+                setIsSuggesting(true);
+                try {
+                    const suggestions = await suggestProductDetails({ productName: newProductName });
+                    form.setValue("description", suggestions.description);
+                    form.setValue("image", suggestions.imageUrl);
+                    setImagePreview(suggestions.imageUrl);
+                    toast({
+                        title: "Suggestions Applied!",
+                        description: "We've filled in a description and image for you.",
+                    });
+                } catch (err) {
+                    console.error("Failed to get suggestions:", err);
+                    toast({
+                        variant: "destructive",
+                        title: "Suggestion Failed",
+                        description: "Could not generate AI suggestions. Please fill in the details manually.",
+                    });
+                } finally {
+                    setIsSuggesting(false);
+                }
+            };
 
-        getSuggestions();
+            getSuggestions();
+        }
     }
-  }, [searchParams, form, toast]);
+  }, [searchParams, form, toast, isEditing]);
 
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -184,16 +186,22 @@ function ProductsPageContent() {
   }
   
   const resetForm = () => {
-    form.reset()
+    form.reset({
+      name: "",
+      description: "",
+      price: 0,
+      quantity: 0,
+      image: "",
+    })
     removeImage()
     setIsEditing(false)
     suggestionAppliedRef.current = false;
   }
 
   const handleEditClick = (product: Product) => {
+    setIsEditing(true);
     form.reset(product);
     setImagePreview(product.image || null);
-    setIsEditing(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
   
@@ -209,6 +217,8 @@ function ProductsPageContent() {
       addProductMutation.mutate(data);
     }
   }
+
+  const isMutating = addProductMutation.isPending || updateProductMutation.isPending;
 
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
@@ -227,6 +237,7 @@ function ProductsPageContent() {
                 accept="image/*"
                 onChange={handleImageChange}
                 className="hidden"
+                disabled={isMutating}
               />
               {imagePreview ? (
                  <div className="relative group">
@@ -243,6 +254,7 @@ function ProductsPageContent() {
                       size="icon"
                       className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity"
                       onClick={removeImage}
+                      disabled={isMutating}
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -253,7 +265,7 @@ function ProductsPageContent() {
                   variant="outline"
                   className="w-full h-32 border-dashed flex flex-col items-center justify-center"
                   onClick={() => document.getElementById('image-upload')?.click()}
-                  disabled={isSuggesting}
+                  disabled={isSuggesting || isMutating}
                 >
                   {isSuggesting ? (
                     <>
@@ -277,7 +289,7 @@ function ProductsPageContent() {
                 <FormItem>
                   <FormLabel>Product Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Fresh Tomatoes" {...field} />
+                    <Input placeholder="e.g. Fresh Tomatoes" {...field} disabled={isMutating}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -296,7 +308,7 @@ function ProductsPageContent() {
                     <Textarea
                       placeholder="e.g. Organically grown, hand-picked tomatoes from our farm."
                       {...field}
-                      disabled={isSuggesting}
+                      disabled={isSuggesting || isMutating}
                     />
                   </FormControl>
                   <FormMessage />
@@ -311,7 +323,7 @@ function ProductsPageContent() {
                   <FormItem>
                     <FormLabel>Price (₹ per kg)</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="25" {...field} />
+                      <Input type="number" placeholder="25" {...field} disabled={isMutating}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -324,7 +336,7 @@ function ProductsPageContent() {
                   <FormItem>
                     <FormLabel>Quantity (kg)</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="500" {...field} />
+                      <Input type="number" placeholder="500" {...field} disabled={isMutating}/>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -333,11 +345,12 @@ function ProductsPageContent() {
             </div>
             <div className="flex gap-2">
                 {isEditing && (
-                    <Button type="button" variant="secondary" className="w-full" onClick={resetForm}>
+                    <Button type="button" variant="secondary" className="w-full" onClick={resetForm} disabled={isMutating}>
                         Cancel
                     </Button>
                 )}
-                <Button type="submit" className="w-full" disabled={addProductMutation.isPending || updateProductMutation.isPending || isSuggesting}>
+                <Button type="submit" className="w-full" disabled={isSuggesting || isMutating}>
+                {isMutating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 {addProductMutation.isPending ? "Adding..." : updateProductMutation.isPending ? "Saving..." : isEditing ? "Save Changes" : "Add Product"}
                 </Button>
             </div>
@@ -409,7 +422,10 @@ function ProductsPageContent() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteClick(product.id!)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDeleteClick(product.id!)} disabled={deleteProductMutation.isPending}>
+                                {deleteProductMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                Delete
+                            </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>
@@ -431,3 +447,5 @@ export default function FarmerProductsPage() {
         </Suspense>
     )
 }
+
+    
