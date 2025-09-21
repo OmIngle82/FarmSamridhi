@@ -102,7 +102,7 @@ function NegotiateContent() {
         try {
             await addDoc(messagesCollection, {
                 text: newMessage,
-                sender: user.role, // Assuming the logged in user is the sender
+                sender: user.role, // 'farmer'
                 timestamp: serverTimestamp(),
             });
             setNewMessage("");
@@ -163,8 +163,8 @@ function NegotiateContent() {
                         </Button>
                     </div>
                      <div className="flex gap-2 mt-4">
-                        <Button variant="outline" size="sm" onClick={() => setNewMessage(`I can accept ₹${(order.amount * 0.95).toLocaleString()}.`)}>Suggest: ₹{(order.amount * 0.95).toLocaleString()}</Button>
-                        <Button variant="outline" size="sm" onClick={() => setNewMessage(`My final offer is ₹${order.amount.toLocaleString()}.`)}>Stick to Original Price</Button>
+                        <Button variant="outline" size="sm" onClick={() => setNewMessage(`I can accept ₹${(order.amount * 1.05).toLocaleString()}.`)}>Suggest: ₹{(order.amount * 1.05).toLocaleString()}</Button>
+                        <Button variant="outline" size="sm" onClick={() => setNewMessage(`My final offer is ₹${order.amount.toLocaleString()}.`)}>Final Offer</Button>
                         <Button variant="secondary" size="sm" onClick={() => toast({title: "Offer Accepted!", description: "You have accepted the buyer's offer."})}>Accept Offer</Button>
                     </div>
                 </div>

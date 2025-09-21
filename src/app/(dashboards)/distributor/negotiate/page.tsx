@@ -102,7 +102,7 @@ function NegotiateContent() {
         try {
             await addDoc(messagesCollection, {
                 text: newMessage,
-                sender: user.role, // Assuming the logged in user is the sender
+                sender: user.role, // "distributor" is a buyer
                 timestamp: serverTimestamp(),
             });
             setNewMessage("");
@@ -135,7 +135,7 @@ function NegotiateContent() {
     return (
         <DashboardCard
             title={`Negotiating Order: ${order.id}`}
-            description={`Conversation with Farmer for customer: ${order.customer}.`}
+            description={`Conversation with the farmer for customer: ${order.customer}.`}
         >
             <div className="flex flex-col h-[65vh]">
                 <div className="flex-grow overflow-y-auto p-4 border rounded-t-lg bg-muted/20 space-y-4">
@@ -164,7 +164,7 @@ function NegotiateContent() {
                     </div>
                      <div className="flex gap-2 mt-4">
                         <Button variant="outline" size="sm" onClick={() => setNewMessage(`I can offer ₹${(order.amount * 0.9).toLocaleString()} for this order.`)}>Suggest: ₹{(order.amount * 0.9).toLocaleString()}</Button>
-                        <Button variant="outline" size="sm" onClick={() => setNewMessage(`Can you do ₹${(order.amount * 0.95).toLocaleString()}?`)}>Counter-offer</Button>
+                        <Button variant="outline" size="sm" onClick={() => setNewMessage(`My final offer is ₹${(order.amount * 0.95).toLocaleString()}.`)}>Final Offer</Button>
                         <Button variant="secondary" size="sm" onClick={() => toast({title: "Offer Accepted!", description: "You have accepted the farmer's price."})}>Accept Offer</Button>
                     </div>
                 </div>
