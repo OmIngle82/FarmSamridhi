@@ -13,6 +13,7 @@ import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
+import Link from "next/link"
 
 export default function FarmerSchemesPage() {
   const { toast } = useToast()
@@ -33,14 +34,6 @@ export default function FarmerSchemesPage() {
         })
     }
   }, [error, toast]);
-
-
-  const showToast = (title: string, description: string) => {
-    toast({
-        title,
-        description,
-    });
-  };
 
   return (
     <DashboardCard
@@ -63,7 +56,9 @@ export default function FarmerSchemesPage() {
                     <AccordionContent>
                         <p className="mb-2">{scheme.description}</p>
                         <p><strong className="font-medium">Eligibility: </strong>{scheme.eligibility}</p>
-                        <Button variant="link" className="px-0 h-auto mt-2" onClick={() => showToast('Learn More', `Opening details for ${scheme.name}`)}>Learn More</Button>
+                        <Button variant="link" className="px-0 h-auto mt-2" asChild>
+                           <Link href="#" target="_blank" rel="noopener noreferrer">Learn More</Link>
+                        </Button>
                     </AccordionContent>
                 </AccordionItem>
             ))}
