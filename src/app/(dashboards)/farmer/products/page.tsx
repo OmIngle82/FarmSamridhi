@@ -19,12 +19,25 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 import { useToast } from "@/hooks/use-toast"
-import { addProduct, getProducts, type Product } from "@/ai/flows/farmer-flow"
+import { addProduct, getProducts, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Upload, X } from "lucide-react"
+import { Upload, X, Trash2, Edit } from "lucide-react"
 
 const productSchema = z.object({
+  id: z.string().optional(),
   name: z.string().min(1, "Product name is required"),
   description: z.string().min(1, "Description is required"),
   price: z.coerce.number().min(0, "Price must be a positive number"),
@@ -39,6 +52,7 @@ export default function FarmerProductsPage() {
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [isEditing, setIsEditing] = useState(false)
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -87,31 +101,68 @@ export default function FarmerProductsPage() {
   const removeImage = () => {
     setImagePreview(null);
     form.setValue("image", "");
-    // Reset file input
     const fileInput = document.getElementById('image-upload') as HTMLInputElement;
     if(fileInput) fileInput.value = "";
+  }
+  
+  const resetForm = () => {
+    form.reset()
+    removeImage()
+    setIsEditing(false)
+  }
+
+  const handleEditClick = (product: Product) => {
+    form.reset(product);
+    setImagePreview(product.image || null);
+    setIsEditing(true);
+  }
+  
+  const handleDeleteClick = async (productId: string) => {
+     try {
+      await deleteProduct({ productId });
+      setProducts(products.filter((p) => p.id !== productId));
+      toast({
+        title: "Success",
+        description: "Product deleted successfully.",
+      });
+    } catch (error) {
+      console.error("Failed to delete product:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not delete product.",
+      });
+    }
   }
 
 
   const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
     try {
-      const newProduct = await addProduct({
-        farmerId: "FARM001",
-        ...data,
-      })
-      setProducts((prev) => [...prev, newProduct])
-      toast({
-        title: "Success",
-        description: "Product added successfully.",
-      })
-      form.reset()
-      removeImage()
+      if (isEditing) {
+        const updated = await updateProduct(data as Product)
+        setProducts(products.map(p => p.id === updated.id ? updated : p))
+        toast({
+            title: "Success",
+            description: "Product updated successfully.",
+        })
+      } else {
+        const newProduct = await addProduct({
+            farmerId: "FARM001",
+            ...data,
+        })
+        setProducts((prev) => [...prev, newProduct])
+        toast({
+            title: "Success",
+            description: "Product added successfully.",
+        })
+      }
+      resetForm()
     } catch (error) {
-      console.error("Failed to add product:", error)
+      console.error("Failed to save product:", error)
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Could not add product.",
+        description: `Could not ${isEditing ? 'update' : 'add'} product.`,
       })
     }
   }
@@ -119,8 +170,8 @@ export default function FarmerProductsPage() {
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
       <DashboardCard
-        title="Add a New Product"
-        description="Fill out the details to list a new item for sale."
+        title={isEditing ? "Edit Product" : "Add a New Product"}
+        description={isEditing ? "Update the details for this item." : "Fill out the details to list a new item for sale."}
         className="lg:col-span-1"
       >
         <Form {...form}>
@@ -225,9 +276,16 @@ export default function FarmerProductsPage() {
                 )}
               />
             </div>
-            <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-              {form.formState.isSubmitting ? "Adding..." : "Add Product"}
-            </Button>
+            <div className="flex gap-2">
+                {isEditing && (
+                    <Button type="button" variant="secondary" className="w-full" onClick={resetForm}>
+                        Cancel
+                    </Button>
+                )}
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                {form.formState.isSubmitting ? (isEditing ? "Saving..." : "Adding...") : (isEditing ? "Save Changes" : "Add Product")}
+                </Button>
+            </div>
           </form>
         </Form>
       </DashboardCard>
@@ -274,8 +332,28 @@ export default function FarmerProductsPage() {
                     <span className="text-sm text-muted-foreground">{product.quantity} kg available</span>
                   </div>
                   <div className="flex gap-2 mt-4">
-                     <Button variant="outline" size="sm" className="w-full" onClick={() => toast({title: "Coming Soon", description:"Editing products will be available soon."})}>Edit</Button>
-                     <Button variant="destructive" size="sm" className="w-full" onClick={() => toast({title: "Coming Soon", description:"Deleting products will be available soon."})}>Delete</Button>
+                     <Button variant="outline" size="sm" className="w-full" onClick={() => handleEditClick(product)}>
+                        <Edit className="mr-2 h-4 w-4" /> Edit
+                    </Button>
+                    <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="sm" className="w-full">
+                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                            </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                This action cannot be undone. This will permanently delete the product "{product.name}".
+                            </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => handleDeleteClick(product.id)}>Delete</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </div>
               </div>

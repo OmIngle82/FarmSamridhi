@@ -32,10 +32,14 @@ import {
 } from "@/components/ui/select"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { placeholderImages } from "@/lib/placeholder-images"
+import { useToast } from "@/hooks/use-toast"
+import Link from "next/link"
+
 
 export function Header() {
   const router = useRouter()
   const userAvatar = placeholderImages.find(p => p.id === 'avatar-1');
+  const { toast } = useToast()
 
   return (
     <header className="sticky top-0 z-10 flex h-16 w-full items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -76,10 +80,10 @@ export function Header() {
           </Select>
         </div>
 
-        <Button variant="ghost" size="icon" aria-label="Use Voice Command">
+        <Button variant="ghost" size="icon" aria-label="Use Voice Command" onClick={() => toast({ title: "Coming Soon", description: "Voice commands will be available soon." })}>
           <Mic className="h-5 w-5" />
         </Button>
-        <Button variant="ghost" size="icon" aria-label="Scan QR Code">
+        <Button variant="ghost" size="icon" aria-label="Scan QR Code" onClick={() => router.push('/consumer')}>
           <QrCode className="h-5 w-5" />
         </Button>
 
@@ -105,17 +109,19 @@ export function Header() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <User className="mr-2 h-4 w-4" />
-                <span>Profile</span>
+               <DropdownMenuItem asChild>
+                <Link href="/farmer/profile">
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profile</span>
+                </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => toast({ title: "Coming Soon", description: "Settings will be available soon." })}>
                 <Settings className="mr-2 h-4 w-4" />
                 <span>Settings</span>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push('/')}>
               <LogOut className="mr-2 h-4 w-4" />
               <span>Log out</span>
             </DropdownMenuItem>

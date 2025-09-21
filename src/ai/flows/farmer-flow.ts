@@ -30,6 +30,12 @@ const AddProductRequestSchema = z.object({
     image: z.string().optional(),
 });
 
+const UpdateProductRequestSchema = ProductSchema;
+
+const DeleteProductRequestSchema = z.object({
+    productId: z.string(),
+});
+
 const OrderSchema = z.object({
   id: z.string(),
   customer: z.string(),
@@ -37,6 +43,8 @@ const OrderSchema = z.object({
   status: z.string(),
   phone: z.string(),
 });
+
+export type Order = z.infer<typeof OrderSchema>;
 
 const PaymentSchema = z.object({
   id: z.string(),
@@ -72,7 +80,7 @@ let mockProducts: Product[] = [
     { id: "PROD001", name: "Organic Tomatoes", description: "Fresh, juicy, and organically grown tomatoes.", price: 30, quantity: 500, image: "https://picsum.photos/seed/prod-tomato/400/300" },
     { id: "PROD002", name: "Sonora Wheat", description: "High-quality wheat grains, perfect for baking.", price: 25, quantity: 2000, image: "https://picsum.photos/seed/prod-wheat/400/300" },
 ];
-let mockOrders = [
+let mockOrders: Order[] = [
     { id: "ORD001", customer: "BigBasket", amount: 12500, status: "Pending", phone: "9123456780" },
     { id: "ORD002", customer: "Local Mandi", amount: 8200, status: "Shipped", phone: "9123456781" },
     { id: "ORD003", customer: "Reliance Fresh", amount: 25000, status: "Pending", phone: "9123456782" },
@@ -120,12 +128,30 @@ export async function getProducts(
     return Promise.resolve(mockProducts);
 }
 
+export async function getOrder(
+  orderId: string
+): Promise<Order | undefined> {
+    console.log(`Fetching order: ${orderId}`);
+    return Promise.resolve(mockOrders.find(o => o.id === orderId));
+}
+
 export async function addProduct(
     input: z.infer<typeof AddProductRequestSchema>
 ): Promise<Product> {
     return addProductFlow(input);
 }
 
+export async function updateProduct(
+    input: Product
+): Promise<Product> {
+    return updateProductFlow(input);
+}
+
+export async function deleteProduct(
+    input: z.infer<typeof DeleteProductRequestSchema>
+): Promise<{ success: boolean }> {
+    return deleteProductFlow(input);
+}
 
 const getFarmerDataFlow = ai.defineFlow(
   {
@@ -134,8 +160,6 @@ const getFarmerDataFlow = ai.defineFlow(
     outputSchema: FarmerDataSchema,
   },
   async ({ farmerId }) => {
-    // In a real application, you would fetch this data from a database
-    // based on the farmerId. For this prototype, we'll return mock data.
     console.log(`Fetching data for farmer: ${farmerId}`);
 
     return {
@@ -163,5 +187,39 @@ const addProductFlow = ai.defineFlow(
     };
     mockProducts.push(newProduct);
     return newProduct;
+  }
+);
+
+const updateProductFlow = ai.defineFlow(
+  {
+    name: 'updateProductFlow',
+    inputSchema: UpdateProductRequestSchema,
+    outputSchema: ProductSchema,
+  },
+  async (productData) => {
+    console.log(`Updating product: ${productData.id}`);
+    const index = mockProducts.findIndex(p => p.id === productData.id);
+    if (index !== -1) {
+        mockProducts[index] = productData;
+        return mockProducts[index];
+    }
+    throw new Error("Product not found");
+  }
+);
+
+const deleteProductFlow = ai.defineFlow(
+  {
+    name: 'deleteProductFlow',
+    inputSchema: DeleteProductRequestSchema,
+    outputSchema: z.object({ success: z.boolean() }),
+  },
+  async ({ productId }) => {
+    console.log(`Deleting product: ${productId}`);
+    const index = mockProducts.findIndex(p => p.id === productId);
+    if (index !== -1) {
+        mockProducts.splice(index, 1);
+        return { success: true };
+    }
+    return { success: false };
   }
 );

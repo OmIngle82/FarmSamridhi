@@ -15,7 +15,8 @@ import {
   Users,
   Wallet,
   BookOpen,
-  HeartHandshake
+  HeartHandshake,
+  User,
 } from "lucide-react"
 
 import {
@@ -38,6 +39,7 @@ const farmerNav = [
   { name: "Market Prices", href: "/farmer/market", icon: BarChart },
   { name: "Finances", href: "/farmer/finances", icon: Landmark },
   { name: "Govt. Schemes", href: "/farmer/schemes", icon: BookOpen },
+  { name: "Profile", href: "/farmer/profile", icon: User },
 ]
 
 const distributorNav = [

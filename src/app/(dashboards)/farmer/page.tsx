@@ -124,7 +124,9 @@ export default function FarmerDashboard() {
                     <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
                 </Link>
             </Button>
-            <Button variant="secondary" onClick={() => showToast('Manage Profile', 'Profile management page is not yet available.')}>Manage Profile</Button>
+            <Button variant="secondary" asChild>
+                <Link href="/farmer/profile">Manage Profile</Link>
+            </Button>
         </div>
       </DashboardCard>
 
@@ -154,7 +156,9 @@ export default function FarmerDashboard() {
                 </TableCell>
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
-                        <Button variant="outline" size="sm" onClick={() => showToast('Negotiate', `Starting negotiation for ${order.id}`)}>Negotiate</Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/farmer/negotiate?orderId=${order.id}`}>Negotiate</Link>
+                        </Button>
                         <a href={`tel:${order.phone}`}>
                           <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4"/></Button>
                         </a>

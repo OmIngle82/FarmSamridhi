@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 import {
   Table,
   TableBody,
@@ -80,7 +81,9 @@ export default function FarmerOrdersPage() {
                 </TableCell>
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
-                        <Button variant="outline" size="sm" onClick={() => showToast('Negotiate', `Starting negotiation for ${order.id}`)}>Negotiate</Button>
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/farmer/negotiate?orderId=${order.id}`}>Negotiate</Link>
+                        </Button>
                         <a href={`tel:${order.phone}`}>
                           <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4"/></Button>
                         </a>
