@@ -1,3 +1,4 @@
+
 "use client"
 
 import {
@@ -50,6 +51,16 @@ export function Header() {
     logout();
     router.push('/');
   }
+  
+  const handleLanguageChange = (value: string) => {
+    let languageName = "English";
+    if (value === "hi") languageName = "हिन्दी";
+    if (value === "mr") languageName = "मराठी";
+    toast({
+      title: "Language Changed",
+      description: `App language set to ${languageName}. (UI translation coming soon!)`,
+    })
+  }
 
   return (
     <header className="sticky top-0 z-10 flex h-16 w-full items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -78,7 +89,7 @@ export function Header() {
       <div className="flex flex-1 items-center justify-end gap-4">
         <div className="flex items-center gap-2">
           <Languages className="h-5 w-5 text-muted-foreground" />
-          <Select defaultValue="en">
+          <Select defaultValue="en" onValueChange={handleLanguageChange}>
             <SelectTrigger className="w-[120px] h-9">
               <SelectValue placeholder="Language" />
             </SelectTrigger>
