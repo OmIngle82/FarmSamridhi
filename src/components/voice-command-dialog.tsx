@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Mic, Loader2, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { handleVoiceCommand } from "@/ai/flows/voice-command-flow"
-import { getAudioVisualization, type AudioVisualizationOutput } from "@/ai/flows/get-audio-visualization-flow"
+import { getAudioVisualization } from "@/ai/flows/get-audio-visualization-flow"
 import { AudioVisualizer } from "./audio-visualizer"
 
 type VoiceCommandDialogProps = {
@@ -94,19 +94,20 @@ export function VoiceCommandDialog({
       // Start visualization
       visualizerIntervalRef.current = setInterval(async () => {
         if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
-            // This is a simplified approach. A real app would send small audio chunks.
-            const tempBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
-            if (tempBlob.size === 0) return;
-            const reader = new FileReader();
-            reader.readAsDataURL(tempBlob);
-            reader.onloadend = async () => {
-                const base64Audio = reader.result as string;
-                try {
-                    const vizData = await getAudioVisualization({ audioDataUri: base64Audio });
-                    setVisualizationData(vizData.waveform);
-                } catch (e) {
-                    console.error("Viz error", e);
-                }
+            try {
+                // In a real app, this might send a recent chunk. For simulation, we just trigger.
+                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                const base64Audio = await new Promise<string>(resolve => {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(audioBlob);
+                    reader.onloadend = () => resolve(reader.result as string);
+                });
+
+                const vizData = await getAudioVisualization({ audioDataUri: base64Audio });
+                setVisualizationData(vizData.waveform);
+            } catch (e) {
+                console.error("Visualization error", e);
+                // Don't stop the interval for viz errors
             }
         }
       }, 200);
