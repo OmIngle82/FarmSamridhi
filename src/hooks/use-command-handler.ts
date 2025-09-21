@@ -29,11 +29,13 @@ export function useCommandHandler(onCommandHandled?: () => void) {
                 break;
 
             case 'filter':
-                if(command.target && command.payload) {
+                if(command.target && command.payload && typeof command.payload === 'object') {
                     const params = new URLSearchParams();
-                    params.set("filter", command.target);
+                    // Convert payload to search params
                     Object.entries(command.payload).forEach(([key, value]) => {
-                        params.set(key, String(value));
+                         if (typeof value === 'string') {
+                            params.set(key.toLowerCase(), value.toLowerCase());
+                        }
                     });
                     
                     // Navigate to the relevant page with filter params

@@ -53,7 +53,7 @@ function OrdersContent() {
   }, [error, toast]);
 
   const handleTabChange = (value: string) => {
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     if (value === 'all') {
         params.delete('status');
     } else {
