@@ -11,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
-import { Phone } from "lucide-react"
+import { MessageSquare, Phone } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
 import { getOrders } from "@/ai/flows/farmer-flow"
@@ -70,10 +70,10 @@ export default function FarmerOrdersPage() {
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/farmer/negotiate?orderId=${order.id}`}>Negotiate</Link>
+                          <Link href={`/farmer/negotiate?orderId=${order.id}`}><MessageSquare className="mr-2 h-4 w-4"/>Negotiate</Link>
                         </Button>
                         <a href={`tel:${order.phone}`}>
-                          <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4"/></Button>
+                          <Button variant="outline" size="icon" className="h-9 w-9"><Phone className="h-4 w-4"/></Button>
                         </a>
                     </div>
                 </TableCell>

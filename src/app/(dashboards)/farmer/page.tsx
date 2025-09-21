@@ -1,3 +1,4 @@
+
 "use client"
 import Link from "next/link"
 import {
@@ -28,7 +29,7 @@ import type { ChartConfig } from "@/components/ui/chart"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 
 import { DashboardCard } from "@/components/dashboard-card"
-import { DollarSign, Phone, PlusCircle } from "lucide-react"
+import { DollarSign, MessageSquare, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
@@ -145,10 +146,10 @@ export default function FarmerDashboard() {
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/farmer/negotiate?orderId=${order.id}`}>Negotiate</Link>
+                          <Link href={`/farmer/negotiate?orderId=${order.id}`}><MessageSquare className="mr-2 h-4 w-4" />Negotiate</Link>
                         </Button>
                         <a href={`tel:${order.phone}`}>
-                          <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4"/></Button>
+                          <Button variant="outline" size="icon" className="h-9 w-9"><Phone className="h-4 w-4"/></Button>
                         </a>
                     </div>
                 </TableCell>
@@ -186,57 +187,4 @@ export default function FarmerDashboard() {
       <DashboardCard
         title="Live Market Prices (MSP)"
         description="Current Minimum Support Prices for key crops."
-        className="xl:col-span-2"
-      >
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart accessibilityLayer data={marketPrices}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="crop"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-             <YAxis />
-            <Tooltip content={<ChartTooltipContent />} />
-            <Bar dataKey="price" fill="var(--color-price)" radius={4} />
-            <Bar dataKey="target" fill="var(--color-target)" radius={4} />
-          </BarChart>
-        </ChartContainer>
-      </DashboardCard>
-
-      <DashboardCard
-        title="Microcredit Options"
-        description="Access loans to grow your farming business."
-      >
-        <div className="flex flex-col h-full justify-between">
-            <p className="text-muted-foreground mb-4">Get quick and easy access to microloans from our partner institutions with competitive interest rates.</p>
-            <Button className="w-full mt-auto" onClick={() => toast({title: 'Loan Application', description: 'Redirecting to loan application portal...'})}>
-                <DollarSign className="mr-2 h-4 w-4" />
-                Apply for a Loan
-            </Button>
-        </div>
-      </DashboardCard>
-
-      <DashboardCard
-        title="Government Schemes"
-        description="Stay updated on beneficial government programs."
-      >
-        <Accordion type="single" collapsible className="w-full">
-            {schemes.map(scheme => (
-                <AccordionItem value={scheme.name} key={scheme.name}>
-                    <AccordionTrigger>{scheme.name}</AccordionTrigger>
-                    <AccordionContent>
-                        <p className="mb-2">{scheme.description}</p>
-                        <p><strong className="font-medium">Eligibility: </strong>{scheme.eligibility}</p>
-                        <Button variant="link" className="px-0 h-auto mt-2" onClick={() => toast({title: 'Learn More', description: `Opening details for ${scheme.name}`})}>Learn More</Button>
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-        </Accordion>
-      </DashboardCard>
-
-    </div>
-  )
-}
+        className="xl

@@ -1,3 +1,4 @@
+
 "use client"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -20,6 +21,7 @@ import { getOrders } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
+import Link from "next/link"
 
 const farmers = [
   { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
@@ -116,17 +118,23 @@ export default function DistributorDashboard() {
                 <TableHead>Order ID</TableHead>
                 <TableHead>Customer</TableHead>
                 <TableHead>Amount</TableHead>
-                <TableHead className="text-right">Status</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {orders.map((order) => (
-                <TableRow key={order.id} onClick={() => showToast('View Order', `Viewing details for order ${order.id}`)} className="cursor-pointer">
+                <TableRow key={order.id}>
                     <TableCell className="font-medium">{order.id}</TableCell>
                     <TableCell>{order.customer}</TableCell>
                     <TableCell>₹{order.amount.toLocaleString()}</TableCell>
-                    <TableCell className="text-right">
-                    <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>{order.status}</Badge>
+                    <TableCell>
+                      <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>{order.status}</Badge>
+                    </TableCell>
+                     <TableCell className="text-right">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/distributor/negotiate?orderId=${order.id}`}>Negotiate</Link>
+                        </Button>
                     </TableCell>
                 </TableRow>
                 ))}
@@ -149,9 +157,4 @@ export default function DistributorDashboard() {
               </div>
               <Progress value={item.level} aria-label={`${item.item} stock level`} />
             </div>
-          ))}
-        </div>
-      </DashboardCard>
-    </div>
-  )
-}
+          

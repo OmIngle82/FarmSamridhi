@@ -1,3 +1,4 @@
+
 "use client"
 
 import Link from "next/link"
@@ -18,6 +19,7 @@ import {
   HeartHandshake,
   User,
   QrCode,
+  MessageSquare,
 } from "lucide-react"
 
 import {
@@ -48,6 +50,7 @@ const navConfig = {
         { name: "Dashboard", href: "/distributor", icon: Home },
         { name: "Farmers", href: "/distributor", icon: Users }, // Changed to point to main dashboard for now
         { name: "Orders", href: "/distributor", icon: Truck }, // Changed to point to main dashboard for now
+        { name: "Negotiations", href: "/distributor/negotiate", icon: MessageSquare },
         { name: "Inventory", href: "/distributor", icon: Package }, // Changed to point to main dashboard for now
         { name: "Transactions", href: "/distributor", icon: Wallet }, // Changed to point to main dashboard for now
     ],
@@ -106,7 +109,7 @@ export function SidebarNav() {
               <SidebarMenuItem key={item.name}>
                  <Link href={item.href} className="w-full">
                     <SidebarMenuButton
-                        isActive={pathname === item.href}
+                        isActive={pathname.startsWith(item.href)}
                         tooltip={item.name}
                     >
                         <Icon />
@@ -115,9 +118,3 @@ export function SidebarNav() {
                 </Link>
               </SidebarMenuItem>
             )
-          })}
-        </SidebarMenu>
-      </SidebarContent>
-    </>
-  )
-}
