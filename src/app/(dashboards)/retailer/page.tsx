@@ -86,7 +86,7 @@ export default function RetailerDashboard() {
                     <p className="text-sm text-muted-foreground">from Suresh Patel</p>
                     <div className="flex justify-between items-center mt-4">
                         <span className="font-bold text-lg">₹{product.price}/kg</span>
-                        <Button size="sm" onClick={() => showToast('Purchase (Demo)', `In a real app, this would add ${product.name} to your cart.`)}>
+                        <Button size="sm" onClick={() => showToast('Purchase (Demo)', `This would add ${product.name} to a cart.`)}>
                         <Plus className="mr-1 h-4 w-4" /> Buy
                         </Button>
                     </div>

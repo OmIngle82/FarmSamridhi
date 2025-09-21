@@ -131,14 +131,16 @@ export function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                <DropdownMenuItem asChild>
-                <Link href="/farmer/profile">
+                <Link href={`/${user?.role}/profile`}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profile</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast({ title: "Coming Soon", description: "Settings will be available soon." })}>
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
+              <DropdownMenuItem asChild>
+                 <Link href={`/${user?.role}/profile`}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Settings</span>
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />

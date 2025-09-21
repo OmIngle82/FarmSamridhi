@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import Link from "next/link"
@@ -52,24 +51,21 @@ const navConfig = {
     distributor: [
         { name: "Dashboard", href: "/distributor", icon: Home },
         { name: "New Order", href: "/distributor/new-order", icon: PlusCircle },
-        { name: "Farmers", href: "/distributor", icon: Users }, // Changed to point to main dashboard for now
         { name: "Orders", href: "/distributor", icon: Truck }, // Changed to point to main dashboard for now
-        { name: "Negotiations", href: "/distributor/negotiate", icon: MessageSquare },
+        { name: "Negotiations", href: "/distributor/negotiate?orderId=ORD001", icon: MessageSquare },
         { name: "Inventory", href: "/distributor", icon: Package }, // Changed to point to main dashboard for now
-        { name: "Transactions", href: "/distributor", icon: Wallet }, // Changed to point to main dashboard for now
     ],
     retailer: [
         { name: "Dashboard", href: "/retailer", icon: Home },
-        { name: "Source Products", href: "/retailer", icon: ShoppingCart }, // Changed to point to main dashboard for now
-        { name: "Trace Journey", href: "/journey", icon: Milestone },
-        { name: "My Inventory", href: "/retailer", icon: Store }, // Changed to point to main dashboard for now
-        { name: "Transactions", href: "/retailer", icon: Wallet }, // Changed to point to main dashboard for now
+        { name: "Source Products", href: "/retailer", icon: ShoppingCart },
+        { name: "Trace Journey", href: "/journey?productId=PROD001", icon: Milestone },
+        { name: "Transactions", href: "/retailer", icon: Wallet },
     ],
     consumer: [
         { name: "Dashboard", href: "/consumer", icon: Home },
-        { name: "Scan Product", href: "/consumer", icon: QrCode }, // Changed to point to main dashboard for now
-        { name: "My Purchases", href: "/consumer", icon: ShoppingCart }, // Changed to point to main dashboard for now
-        { name: "Favorite Farmers", href: "/consumer", icon: HeartHandshake }, // Changed to point to main dashboard for now
+        { name: "Scan Product", href: "/consumer", icon: QrCode },
+        { name: "My Purchases", href: "/consumer", icon: ShoppingCart }, // Placeholder
+        { name: "Favorite Farmers", href: "/consumer", icon: HeartHandshake }, // Placeholder
     ]
 };
 
@@ -115,7 +111,7 @@ export function SidebarNav() {
               <SidebarMenuItem key={item.name}>
                  <Link href={item.href} className="w-full">
                     <SidebarMenuButton
-                        isActive={pathname.startsWith(item.href)}
+                        isActive={pathname === item.href}
                         tooltip={item.name}
                     >
                         <Icon />
@@ -143,5 +139,3 @@ export function SidebarNav() {
     </>
   )
 }
-
-    

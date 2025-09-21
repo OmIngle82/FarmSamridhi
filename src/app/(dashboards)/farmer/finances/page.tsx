@@ -97,8 +97,32 @@ export default function FarmerFinancesPage() {
     });
   }
 
-  const showToast = (title: string, description: string) => {
-    toast({ title, description });
+  const handleDownloadReport = () => {
+    let reportContent = "Financial Report\n";
+    reportContent += "====================\n\n";
+    reportContent += `Total Income: ₹${totalIncome.toLocaleString()}\n\n`;
+    reportContent += "All Payments:\n";
+    if (payments) {
+        payments.forEach(p => {
+            reportContent += `- ID: ${p.id}, From: ${p.from}, Amount: ₹${p.amount.toLocaleString()}, Date: ${p.date}\n`;
+        });
+    } else {
+        reportContent += "No payments recorded.\n";
+    }
+
+    const blob = new Blob([reportContent], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'financial-report.txt';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+        title: "Report Downloaded",
+        description: "Your financial report has been saved as a text file.",
+    });
   };
 
   return (
@@ -137,7 +161,7 @@ export default function FarmerFinancesPage() {
                 <Button variant="outline" onClick={() => setIsExpenseSheetOpen(true)}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
                 </Button>
-                <Button variant="outline" onClick={() => showToast('Download Report', 'Feature coming soon!')}>
+                <Button variant="outline" onClick={handleDownloadReport}>
                     <Download className="mr-2 h-4 w-4" /> Download Report
                 </Button>
             </div>
@@ -163,7 +187,7 @@ export default function FarmerFinancesPage() {
             </TableHeader>
             <TableBody>
                 {payments.map((payment) => (
-                <TableRow key={payment.id} onClick={() => showToast('View Payment', `Viewing details for payment ${payment.id}`)} className="cursor-pointer">
+                <TableRow key={payment.id} onClick={() => toast({ title: 'View Details (Demo)', description: 'In a real app, this would open a detailed view for the payment.'})} className="cursor-pointer">
                     <TableCell className="font-medium">{payment.id}</TableCell>
                     <TableCell>{payment.from}</TableCell>
                     <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
