@@ -88,29 +88,32 @@ export function VoiceCommandDialog({
         }
       }
 
-      mediaRecorderRef.current.start()
+      mediaRecorderRef.current.start(250) // Capture data in chunks for visualization
       setStatus("listening")
 
       // Start visualization
       visualizerIntervalRef.current = setInterval(async () => {
-        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording" && audioChunksRef.current.length > 0) {
             try {
-                // In a real app, this might send a recent chunk. For simulation, we just trigger.
-                const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                // Use the latest audio chunk for a more "live" feel
+                const latestBlob = new Blob(audioChunksRef.current.slice(-1), { type: 'audio/webm' });
                 const base64Audio = await new Promise<string>(resolve => {
                     const reader = new FileReader();
-                    reader.readAsDataURL(audioBlob);
+                    reader.readAsDataURL(latestBlob);
                     reader.onloadend = () => resolve(reader.result as string);
                 });
 
-                const vizData = await getAudioVisualization({ audioDataUri: base64Audio });
-                setVisualizationData(vizData.waveform);
+                if (base64Audio.length > 25) { // Ensure there is data
+                    const vizData = await getAudioVisualization({ audioDataUri: base64Audio });
+                    setVisualizationData(vizData.waveform);
+                }
+
             } catch (e) {
                 console.error("Visualization error", e);
                 // Don't stop the interval for viz errors
             }
         }
-      }, 200);
+      }, 300);
 
     } catch (err) {
       console.error("Error accessing microphone:", err)

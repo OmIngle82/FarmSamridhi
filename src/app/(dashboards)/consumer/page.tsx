@@ -29,6 +29,7 @@ export default function ConsumerDashboard() {
   
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const streamRef = useRef<MediaStream | null>(null);
 
   const { data: journeyData, isFetching: isFetchingJourney, error, isSuccess } = useQuery({
     queryKey: ['productJourney', scannedProductId],
@@ -47,13 +48,19 @@ export default function ConsumerDashboard() {
       setScannedProductId(null);
     }
   }, [error, toast]);
+  
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+  }
 
   useEffect(() => {
-    let stream: MediaStream | null = null;
     let animationFrameId: number | null = null;
 
     const tick = () => {
-      if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA && canvasRef.current) {
+       if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA && canvasRef.current) {
         const video = videoRef.current;
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
@@ -63,17 +70,22 @@ export default function ConsumerDashboard() {
           canvas.width = video.videoWidth;
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          const code = jsQR(imageData.data, imageData.width, imageData.height, {
-            inversionAttempts: "dontInvert",
-          });
+          try {
+            const code = jsQR(imageData.data, imageData.width, imageData.height, {
+              inversionAttempts: "dontInvert",
+            });
 
-          if (code) {
-            console.log("Found QR code", code.data);
-            setScannedProductId(code.data);
-            setIsScanning(false);
+            if (code) {
+              console.log("Found QR code", code.data);
+              setScannedProductId(code.data);
+              handleCloseScanner();
+            }
+          } catch (e) {
+            console.error("jsQR error:", e);
           }
         }
       }
+      // Check isScanning inside the loop to ensure it stops promptly
       if (isScanning) {
         animationFrameId = requestAnimationFrame(tick);
       }
@@ -82,14 +94,16 @@ export default function ConsumerDashboard() {
     if (isScanning) {
       const getCameraPermission = async () => {
         try {
-          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+          streamRef.current = stream;
           setHasCameraPermission(true);
 
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
-            videoRef.current.addEventListener('loadeddata', () => {
-                animationFrameId = requestAnimationFrame(tick);
-            });
+            // The 'loadeddata' event is a good place to start the animation loop
+            videoRef.current.onloadeddata = () => {
+              animationFrameId = requestAnimationFrame(tick);
+            };
           }
         } catch (error) {
           console.error('Error accessing camera:', error);
@@ -104,14 +118,12 @@ export default function ConsumerDashboard() {
       };
 
       getCameraPermission();
-      
+    } else {
+        stopCamera();
     }
     
     return () => {
-      // Stop camera stream and animation frame when component unmounts or scanning stops
-      if (stream) {
-          stream.getTracks().forEach(track => track.stop());
-      }
+      stopCamera();
       if (animationFrameId) {
           cancelAnimationFrame(animationFrameId);
       }
