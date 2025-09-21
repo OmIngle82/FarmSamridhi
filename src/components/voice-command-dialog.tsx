@@ -11,7 +11,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Mic, Waves, Loader2, X } from "lucide-react"
+import { Mic, Loader2, X, Waves } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { handleVoiceCommand } from "@/ai/flows/voice-command-flow"
 
@@ -31,11 +31,14 @@ export function VoiceCommandDialog({
   >("idle")
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+
 
   const startRecording = async () => {
     setStatus("requesting")
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      setAudioStream(stream);
       mediaRecorderRef.current = new MediaRecorder(stream, { mimeType: 'audio/webm' });
       audioChunksRef.current = []
 
@@ -100,6 +103,10 @@ export function VoiceCommandDialog({
     ) {
       mediaRecorderRef.current.stop()
     }
+     if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        setAudioStream(null);
+    }
   }
   
   const handleClose = () => {
@@ -111,10 +118,9 @@ export function VoiceCommandDialog({
     if (open) {
       setStatus("idle")
     } else {
-        if(mediaRecorderRef.current && mediaRecorderRef.current.stream){
-            mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop());
-        }
+        stopRecording();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   return (
@@ -129,8 +135,8 @@ export function VoiceCommandDialog({
 
         <div className="flex flex-col items-center justify-center h-48">
           {status === "listening" && (
-            <div className="flex flex-col items-center gap-4 text-primary">
-              <Waves className="h-16 w-16 animate-pulse" />
+             <div className="flex flex-col items-center gap-4 text-primary">
+              <Waves className="h-16 w-16" />
               <p>Listening...</p>
             </div>
           )}
