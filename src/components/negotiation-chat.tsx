@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
 import { type Order } from '@/ai/flows/farmer-flow'
 import { Skeleton } from '@/components/ui/skeleton'
-import { ArrowLeft, Send } from 'lucide-react'
+import { ArrowLeft, Send, Loader2 } from 'lucide-react'
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/auth-context'
 
@@ -94,6 +94,12 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
             setIsSending(false);
         }
     }
+    
+    const handleQuickReply = (text: string) => {
+        setNewMessage(text);
+        // Focus the input after setting the message
+        document.getElementById("chat-input")?.focus();
+    }
 
     if (isLoading) {
         return (
@@ -106,9 +112,9 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
     if (!order) {
          return (
             <DashboardCard title="Order Not Found" description="The requested order could not be found.">
-                <Link href={backLinkHref}>
-                    <Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" />{backLinkText}</Button>
-                </Link>
+                <Button asChild variant="outline">
+                    <Link href={backLinkHref}><ArrowLeft className="mr-2 h-4 w-4" />{backLinkText}</Link>
+                </Button>
             </DashboardCard>
         );
     }
@@ -120,6 +126,11 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
         >
             <div className="flex flex-col h-[65vh]">
                 <div className="flex-grow overflow-y-auto p-4 border rounded-t-lg bg-muted/20 space-y-4">
+                    {messages.length === 0 && (
+                        <div className="flex items-center justify-center h-full text-muted-foreground">
+                            <p>No messages yet. Start the conversation!</p>
+                        </div>
+                    )}
                     {messages.map((msg, index) => (
                         <div key={msg.id || index} className={`flex items-end gap-2 ${msg.sender === user?.role ? 'justify-end' : 'justify-start'}`}>
                             <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${msg.sender === user?.role ? 'bg-primary text-primary-foreground' : 'bg-background'}`}>
@@ -130,23 +141,24 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
                     <div ref={chatEndRef} />
                 </div>
                 <div className="p-4 border-x border-b rounded-b-lg">
+                     <div className="flex gap-2 mb-4">
+                        <Button variant="outline" size="sm" onClick={() => handleQuickReply(quickReply1)}>{quickReply1}</Button>
+                        <Button variant="outline" size="sm" onClick={() => handleQuickReply(quickReply2)}>{quickReply2}</Button>
+                        <Button variant="secondary" size="sm" onClick={onAcceptOffer}>Accept Offer</Button>
+                    </div>
                     <div className="flex gap-2">
-                        <Input 
+                        <Input
+                            id="chat-input"
                             placeholder="Type your message..." 
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                             disabled={isSending}
                         />
-                        <Button onClick={handleSendMessage} disabled={isSending}>
-                            <Send className="h-4 w-4" />
+                        <Button onClick={handleSendMessage} disabled={isSending || !newMessage.trim()}>
+                            {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                             <span className="sr-only">Send</span>
                         </Button>
-                    </div>
-                     <div className="flex gap-2 mt-4">
-                        <Button variant="outline" size="sm" onClick={() => setNewMessage(quickReply1)}>Suggest Offer</Button>
-                        <Button variant="outline" size="sm" onClick={() => setNewMessage(quickReply2)}>Final Offer</Button>
-                        <Button variant="secondary" size="sm" onClick={onAcceptOffer}>Accept Offer</Button>
                     </div>
                 </div>
             </div>

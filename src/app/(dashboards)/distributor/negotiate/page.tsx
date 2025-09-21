@@ -23,7 +23,7 @@ function NegotiateContent() {
     const { toast } = useToast();
     const orderId = searchParams.get('orderId');
     
-    const [order, setOrder] = useState<Order | null>(null);
+    const [order, setOrder] = = useState<Order | null>(null);
     const [loading, setLoading] = useState(true);
     
     useEffect(() => {
@@ -54,7 +54,7 @@ function NegotiateContent() {
             isLoading={loading}
             backLinkHref="/distributor"
             backLinkText="Back to Dashboard"
-            chatDescription={`Conversation with the farmer for customer: ${order?.customer}.`}
+            chatDescription={`Conversation with the farmer for order to customer: ${order?.customer}.`}
             quickReply1={`I can offer ₹${(order ? order.amount * 0.9 : 0).toLocaleString()} for this order.`}
             quickReply2={`My final offer is ₹${(order ? order.amount * 0.95 : 0).toLocaleString()}.`}
             onAcceptOffer={() => toast({title: "Offer Accepted!", description: "You have accepted the farmer's price."})}

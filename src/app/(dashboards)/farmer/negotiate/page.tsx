@@ -56,7 +56,7 @@ function NegotiateContent() {
             backLinkText="Back to Orders"
             chatDescription={`Conversation with ${order?.customer}.`}
             quickReply1={`I can accept ₹${(order ? order.amount * 1.05 : 0).toLocaleString()}.`}
-            quickReply2={`My final offer is ₹${(order ? order.amount : 0).toLocaleString()}.`}
+            quickReply2={`My final price is ₹${(order ? order.amount : 0).toLocaleString()}.`}
             onAcceptOffer={() => toast({title: "Offer Accepted!", description: "You have accepted the buyer's price."})}
        />
     );
