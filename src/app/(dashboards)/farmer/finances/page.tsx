@@ -111,7 +111,13 @@ export default function FarmerFinancesPage() {
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="border p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-muted-foreground">Total Income</h3>
-                    <p className="text-2xl font-bold">₹{loading ? <Skeleton className="h-8 w-32 mt-1" /> : totalIncome.toLocaleString()}</p>
+                    <div className="text-2xl font-bold">
+                        {loading ? (
+                            <Skeleton className="h-8 w-32 mt-1" />
+                        ) : (
+                            `₹${totalIncome.toLocaleString()}`
+                        )}
+                    </div>
                 </div>
                 <div className="border p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-muted-foreground">Active Loans</h3>
