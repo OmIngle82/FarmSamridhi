@@ -1,6 +1,7 @@
 
 "use client"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import {
   Table,
   TableBody,
@@ -14,19 +15,30 @@ import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { MessageSquare, Phone } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { useEffect, useMemo } from "react"
+import { getFarmerData, type Order } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
-export default function FarmerOrdersPage() {
+function OrdersContent() {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
 
-  const { data: orders, isLoading: loading, error } = useQuery({
+  const { data: allOrders, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }),
       select: (data) => data.orders,
   });
+
+  const orders = useMemo(() => {
+    if (!allOrders) return [];
+    const filter = searchParams.get('filter');
+    const status = searchParams.get('status');
+    if (filter === 'orders' && status) {
+        return allOrders.filter(o => o.status.toLowerCase() === status.toLowerCase());
+    }
+    return allOrders;
+  }, [allOrders, searchParams]);
 
   useEffect(() => {
     if (error) {
@@ -86,4 +98,10 @@ export default function FarmerOrdersPage() {
       )}
     </DashboardCard>
   )
+}
+
+export default function FarmerOrdersPage() {
+    return (
+        <OrdersContent />
+    )
 }

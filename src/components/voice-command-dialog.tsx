@@ -2,7 +2,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from "react"
-import { useRouter } from "next/navigation"
 import {
   Dialog,
   DialogContent,
@@ -17,6 +16,7 @@ import { useToast } from "@/hooks/use-toast"
 import { handleVoiceCommand } from "@/ai/flows/voice-command-flow"
 import { getAudioVisualization } from "@/ai/flows/get-audio-visualization-flow"
 import { AudioVisualizer } from "./audio-visualizer"
+import { useCommandHandler } from "@/hooks/use-command-handler"
 
 type VoiceCommandDialogProps = {
   open: boolean
@@ -28,7 +28,8 @@ export function VoiceCommandDialog({
   onOpenChange,
 }: VoiceCommandDialogProps) {
   const { toast } = useToast()
-  const router = useRouter()
+  const { handleCommand } = useCommandHandler(() => onOpenChange(false));
+
   const [status, setStatus] = useState<
     "idle" | "requesting" | "listening" | "processing"
   >("idle")
@@ -64,17 +65,7 @@ export function VoiceCommandDialog({
           const base64Audio = reader.result as string
           try {
             const result = await handleVoiceCommand({ audioDataUri: base64Audio });
-            toast({
-              title: "Command Processed",
-              description: result.feedback,
-            });
-
-            if (result.action === 'navigate' && result.target) {
-                router.push(result.target);
-            } else if (result.action === 'addProduct' && result.target) {
-                router.push(`/farmer/products?newProductName=${encodeURIComponent(result.target)}`);
-            }
-            onOpenChange(false);
+            handleCommand(result);
           } catch (error) {
             console.error("Error processing voice command:", error)
             toast({
@@ -165,7 +156,7 @@ export function VoiceCommandDialog({
         <DialogHeader>
           <DialogTitle>Voice Command</DialogTitle>
           <DialogDescription>
-            Click the button and speak your command. For example, "Go to my products".
+            Click the button and speak your command. For example, "Show me my pending orders".
           </DialogDescription>
         </DialogHeader>
 
