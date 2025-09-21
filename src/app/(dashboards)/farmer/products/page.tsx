@@ -164,6 +164,7 @@ export default function FarmerProductsPage() {
     form.reset(product);
     setImagePreview(product.image || null);
     setIsEditing(true);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
   
   const handleDeleteClick = (productId: string) => {
@@ -294,8 +295,8 @@ export default function FarmerProductsPage() {
                         Cancel
                     </Button>
                 )}
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
-                {form.formState.isSubmitting ? (isEditing ? "Saving..." : "Adding...") : (isEditing ? "Save Changes" : "Add Product")}
+                <Button type="submit" className="w-full" disabled={addProductMutation.isPending || updateProductMutation.isPending}>
+                {addProductMutation.isPending ? "Adding..." : updateProductMutation.isPending ? "Saving..." : isEditing ? "Save Changes" : "Add Product"}
                 </Button>
             </div>
           </form>
@@ -327,13 +328,17 @@ export default function FarmerProductsPage() {
             {products.map((product) => (
               <div key={product.id} className="border rounded-lg overflow-hidden group">
                 <div className="relative h-48 bg-muted">
-                  {product.image && (
+                  {product.image ? (
                     <Image
                       src={product.image}
                       alt={product.name}
                       fill
                       className="object-cover"
                     />
+                  ) : (
+                    <div className="flex items-center justify-center h-full bg-secondary text-muted-foreground">
+                      No Image
+                    </div>
                   )}
                 </div>
                 <div className="p-4">

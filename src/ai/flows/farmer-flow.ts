@@ -182,7 +182,7 @@ const addProductFlow = ai.defineFlow(
   async (productData) => {
     console.log(`Adding product for farmer: ${productData.farmerId}`);
     const newProduct: Product = {
-      id: `PROD${String(mockProducts.length + 1).padStart(3, '0')}`,
+      id: `PROD${String(mockProducts.length + 10).padStart(3, '0')}`, // Make ID more unique
       ...productData,
     };
     mockProducts.push(newProduct);
