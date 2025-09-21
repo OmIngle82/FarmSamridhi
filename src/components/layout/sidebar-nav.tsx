@@ -17,6 +17,7 @@ import {
   BookOpen,
   HeartHandshake,
   User,
+  QrCode,
 } from "lucide-react"
 
 import {
@@ -45,22 +46,22 @@ const navConfig = {
     ],
     distributor: [
         { name: "Dashboard", href: "/distributor", icon: Home },
-        { name: "Farmers", href: "/distributor/farmers", icon: Users },
-        { name: "Orders", href: "/distributor/orders", icon: Truck },
-        { name: "Inventory", href: "/distributor/inventory", icon: Package },
-        { name: "Transactions", href: "/distributor/transactions", icon: Wallet },
+        { name: "Farmers", href: "/distributor", icon: Users }, // Changed to point to main dashboard for now
+        { name: "Orders", href: "/distributor", icon: Truck }, // Changed to point to main dashboard for now
+        { name: "Inventory", href: "/distributor", icon: Package }, // Changed to point to main dashboard for now
+        { name: "Transactions", href: "/distributor", icon: Wallet }, // Changed to point to main dashboard for now
     ],
     retailer: [
         { name: "Dashboard", href: "/retailer", icon: Home },
-        { name: "Source Products", href: "/retailer/products", icon: ShoppingCart },
-        { name: "My Inventory", href: "/retailer/inventory", icon: Store },
-        { name: "Transactions", href: "/retailer/transactions", icon: Wallet },
+        { name: "Source Products", href: "/retailer", icon: ShoppingCart }, // Changed to point to main dashboard for now
+        { name: "My Inventory", href: "/retailer", icon: Store }, // Changed to point to main dashboard for now
+        { name: "Transactions", href: "/retailer", icon: Wallet }, // Changed to point to main dashboard for now
     ],
     consumer: [
         { name: "Dashboard", href: "/consumer", icon: Home },
-        { name: "Track Product", href: "/consumer/track", icon: Package },
-        { name: "My Purchases", href: "/consumer/purchases", icon: ShoppingCart },
-        { name: "Favorite Farmers", href: "/consumer/farmers", icon: HeartHandshake },
+        { name: "Scan Product", href: "/consumer", icon: QrCode }, // Changed to point to main dashboard for now
+        { name: "My Purchases", href: "/consumer", icon: ShoppingCart }, // Changed to point to main dashboard for now
+        { name: "Favorite Farmers", href: "/consumer", icon: HeartHandshake }, // Changed to point to main dashboard for now
     ]
 };
 
@@ -70,14 +71,16 @@ export function SidebarNav() {
   const { user } = useAuth()
   
   const getNavItems = () => {
-    const role = user?.role || "farmer";
-    // Below logic is to determine the navigation items based on the start of the path
-    // This is useful if a user somehow lands on a page for another role.
+    const role = user?.role;
+    if (role && navConfig[role]) {
+      return navConfig[role];
+    }
+    // Fallback for when user role is not yet available or invalid
     if (pathname.startsWith("/farmer")) return navConfig.farmer
     if (pathname.startsWith("/distributor")) return navConfig.distributor
     if (pathname.startsWith("/retailer")) return navConfig.retailer
     if (pathname.startsWith("/consumer")) return navConfig.consumer
-    return navConfig[role] || [];
+    return [];
   }
 
   const navItems = getNavItems()

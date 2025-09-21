@@ -12,16 +12,11 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { DashboardCard } from "@/components/dashboard-card"
-import { placeholderImages } from "@/lib/placeholder-images"
 import { PackageSearch, Plus, Tractor } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-
-const products = [
-  { name: "Fresh Tomatoes", farmer: "Suresh Patel", location: "Nashik", price: "₹25/kg", avatarId: "product-tomato" },
-  { name: "Organic Wheat", farmer: "Priya Singh", location: "Hapur", price: "₹30/kg", avatarId: "product-wheat" },
-  { name: "Himalayan Potatoes", farmer: "Anil Kumar", location: "Moga", price: "₹20/kg", avatarId: "product-potato" },
-  { name: "Sweet Corn", farmer: "Suresh Patel", location: "Nashik", price: "₹15/piece", avatarId: "product-corn" },
-]
+import { useEffect, useState } from "react"
+import { getProducts, type Product, getFarmerData, type FarmerData } from "@/ai/flows/farmer-flow"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const transactions = [
     { id: "TRN001", date: "2024-07-21", item: "Fresh Tomatoes", amount: "₹5,000", status: "Completed" },
@@ -31,6 +26,29 @@ const transactions = [
 
 export default function RetailerDashboard() {
   const { toast } = useToast()
+  const [products, setProducts] = useState<Product[] | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const data = await getProducts({ farmerId: "FARM001" }) // Using FARM001 as a placeholder for all products
+        setProducts(data)
+      } catch (error) {
+        console.error("Failed to fetch products:", error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not load products.",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [toast])
+
 
   const showToast = (title: string, description: string) => {
     toast({
@@ -46,32 +64,42 @@ export default function RetailerDashboard() {
         description="Find fresh produce directly from farmers."
         className="lg:col-span-3"
       >
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => {
-            const image = placeholderImages.find(p => p.id === product.avatarId);
-            return (
-              <div key={product.name} className="border rounded-lg overflow-hidden group">
-                <div className="relative h-40">
-                  <Image src={image?.imageUrl || ""} alt={product.name} layout="fill" objectFit="cover" data-ai-hint={image?.imageHint} />
+        {loading ? (
+             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                {[...Array(4)].map((_, i) => (
+                    <div key={i} className="border rounded-lg p-4 space-y-3">
+                        <Skeleton className="h-40 w-full" />
+                        <Skeleton className="h-5 w-3/4" />
+                        <Skeleton className="h-4 w-1/2" />
+                    </div>
+                ))}
+            </div>
+        ) : !products || products.length === 0 ? (
+            <div className="text-center text-muted-foreground">No products available.</div>
+        ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {products.map((product) => (
+                <div key={product.id} className="border rounded-lg overflow-hidden group">
+                    <div className="relative h-40 bg-muted">
+                    {product.image && <Image src={product.image} alt={product.name} fill className="object-cover" />}
+                    </div>
+                    <div className="p-4">
+                    <h3 className="font-semibold">{product.name}</h3>
+                    <p className="text-sm text-muted-foreground">from Suresh Patel</p>
+                    <div className="flex justify-between items-center mt-4">
+                        <span className="font-bold text-lg">₹{product.price}/kg</span>
+                        <Button size="sm" onClick={() => showToast('Product Added', `${product.name} added to your cart.`)}>
+                        <Plus className="mr-1 h-4 w-4" /> Buy
+                        </Button>
+                    </div>
+                    <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => showToast('Trace Origin', `Tracing origin for ${product.name}...`)}>
+                            <PackageSearch className="mr-2 h-4 w-4" /> Trace Origin
+                        </Button>
+                    </div>
                 </div>
-                <div className="p-4">
-                  <h3 className="font-semibold">{product.name}</h3>
-                  <p className="text-sm text-muted-foreground">from {product.farmer}</p>
-                  <p className="text-sm text-muted-foreground">{product.location}</p>
-                  <div className="flex justify-between items-center mt-4">
-                    <span className="font-bold text-lg">{product.price}</span>
-                    <Button size="sm" onClick={() => showToast('Product Added', `${product.name} added to your cart.`)}>
-                      <Plus className="mr-1 h-4 w-4" /> Buy
-                    </Button>
-                  </div>
-                   <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => showToast('Trace Origin', `Tracing origin for ${product.name}...`)}>
-                        <PackageSearch className="mr-2 h-4 w-4" /> Trace Origin
-                    </Button>
-                </div>
-              </div>
-            )
-          })}
-        </div>
+            ))}
+            </div>
+        )}
       </DashboardCard>
       
       <DashboardCard
@@ -84,6 +112,7 @@ export default function RetailerDashboard() {
             <TableRow>
               <TableHead>Transaction ID</TableHead>
               <TableHead>Date</TableHead>
+
               <TableHead>Item</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead className="text-right">Status</TableHead>

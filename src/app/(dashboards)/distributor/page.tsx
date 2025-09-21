@@ -16,17 +16,14 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useEffect, useState } from "react"
+import { getFarmerData, type FarmerData } from "@/ai/flows/farmer-flow"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const farmers = [
   { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
   { name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2", phone: "9876543211" },
   { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
-]
-
-const orders = [
-  { id: "ORD101", farmer: "Suresh Patel", item: "Tomatoes", qty: "500 kg", status: "In Transit" },
-  { id: "ORD102", farmer: "Priya Singh", item: "Wheat", qty: "2 Tonnes", status: "Delivered" },
-  { id: "ORD103", farmer: "Anil Kumar", item: "Potatoes", qty: "1 Tonne", status: "Pending Pickup" },
 ]
 
 const inventory = [
@@ -37,6 +34,29 @@ const inventory = [
 
 export default function DistributorDashboard() {
   const { toast } = useToast()
+  const [orders, setOrders] = useState<FarmerData['orders'] | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const data = await getFarmerData({ farmerId: "FARM001" }) // Using FARM001 as a placeholder for all orders
+        setOrders(data.orders)
+      } catch (error) {
+        console.error("Failed to fetch orders:", error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not load orders.",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [toast])
+
 
   const showToast = (title: string, description: string) => {
     toast({
@@ -90,30 +110,34 @@ export default function DistributorDashboard() {
         description="Track and manage all your orders."
         className="lg:col-span-2"
       >
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Farmer</TableHead>
-              <TableHead>Item</TableHead>
-              <TableHead>Quantity</TableHead>
-              <TableHead className="text-right">Status</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {orders.map((order) => (
-              <TableRow key={order.id} onClick={() => showToast('View Order', `Viewing details for order ${order.id}`)} className="cursor-pointer">
-                <TableCell className="font-medium">{order.id}</TableCell>
-                <TableCell>{order.farmer}</TableCell>
-                <TableCell>{order.item}</TableCell>
-                <TableCell>{order.qty}</TableCell>
-                <TableCell className="text-right">
-                  <Badge variant={order.status === "Delivered" ? "default" : "secondary"}>{order.status}</Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        {loading ? (
+            <Skeleton className="h-60 w-full" />
+        ) : !orders || orders.length === 0 ? (
+            <div className="text-center text-muted-foreground">No orders found.</div>
+        ) : (
+            <Table>
+            <TableHeader>
+                <TableRow>
+                <TableHead>Order ID</TableHead>
+                <TableHead>Customer</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead className="text-right">Status</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {orders.map((order) => (
+                <TableRow key={order.id} onClick={() => showToast('View Order', `Viewing details for order ${order.id}`)} className="cursor-pointer">
+                    <TableCell className="font-medium">{order.id}</TableCell>
+                    <TableCell>{order.customer}</TableCell>
+                    <TableCell>₹{order.amount.toLocaleString()}</TableCell>
+                    <TableCell className="text-right">
+                    <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>{order.status}</Badge>
+                    </TableCell>
+                </TableRow>
+                ))}
+            </TableBody>
+            </Table>
+        )}
       </DashboardCard>
 
       <DashboardCard
