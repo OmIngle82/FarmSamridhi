@@ -2,6 +2,7 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
+import jsQR from "jsqr"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -27,6 +28,7 @@ export default function ConsumerDashboard() {
   const [scannedProductId, setScannedProductId] = useState<string | null>(null);
   
   const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const { data: journeyData, isFetching: isFetchingJourney, error, isSuccess } = useQuery({
     queryKey: ['productJourney', scannedProductId],
@@ -48,6 +50,34 @@ export default function ConsumerDashboard() {
 
   useEffect(() => {
     let stream: MediaStream | null = null;
+    let animationFrameId: number | null = null;
+
+    const tick = () => {
+      if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA && canvasRef.current) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+
+        if (ctx) {
+          canvas.height = video.videoHeight;
+          canvas.width = video.videoWidth;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+
+          if (code) {
+            console.log("Found QR code", code.data);
+            setScannedProductId(code.data);
+            setIsScanning(false);
+          }
+        }
+      }
+      if (isScanning) {
+        animationFrameId = requestAnimationFrame(tick);
+      }
+    };
     
     if (isScanning) {
       const getCameraPermission = async () => {
@@ -57,6 +87,9 @@ export default function ConsumerDashboard() {
 
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
+            videoRef.current.addEventListener('loadeddata', () => {
+                animationFrameId = requestAnimationFrame(tick);
+            });
           }
         } catch (error) {
           console.error('Error accessing camera:', error);
@@ -72,14 +105,19 @@ export default function ConsumerDashboard() {
 
       getCameraPermission();
       
-      return () => {
-        // Stop camera stream when component unmounts or scanning stops
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
+    }
+    
+    return () => {
+      // Stop camera stream and animation frame when component unmounts or scanning stops
+      if (stream) {
+          stream.getTracks().forEach(track => track.stop());
+      }
+      if (animationFrameId) {
+          cancelAnimationFrame(animationFrameId);
       }
     }
   }, [isScanning, toast]);
+
 
   const handleSimulateScan = () => {
     setIsScanning(false)
@@ -127,7 +165,7 @@ export default function ConsumerDashboard() {
             <QrCode className="w-24 h-24 text-primary" strokeWidth={1} />
             <h3 className="text-2xl font-semibold mt-4">Ready to Scan</h3>
             <p className="text-muted-foreground max-w-sm">
-                Position the product's QR code in front of your camera or simulate a scan to see how it works.
+                Position the product's QR code in front of your camera to trace its origin.
             </p>
           <div className="flex gap-4 mt-6">
             <Button size="lg" onClick={handleStartScan}>
@@ -150,6 +188,7 @@ export default function ConsumerDashboard() {
           </AlertDialogHeader>
           <div className="relative w-full aspect-video bg-muted rounded-md overflow-hidden">
              <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+             <canvas ref={canvasRef} className="hidden" />
              <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-64 h-64 border-4 border-white/50 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"/>
              </div>
@@ -165,7 +204,6 @@ export default function ConsumerDashboard() {
              )}
           </div>
           <AlertDialogFooter>
-            <Button variant="secondary" onClick={handleSimulateScan}>Simulate Scan</Button>
             <Button variant="outline" onClick={handleCloseScanner}>
                 <X className="mr-2 h-4 w-4" /> Cancel
             </Button>
@@ -175,5 +213,3 @@ export default function ConsumerDashboard() {
     </>
   )
 }
-
-    
