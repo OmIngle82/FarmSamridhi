@@ -8,6 +8,7 @@ import { type Order } from '@/ai/flows/farmer-flow'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardCard } from '@/components/dashboard-card'
 import { NegotiationChat } from '@/components/negotiation-chat'
+import { useI18n } from '@/contexts/i18n-context'
 
 
 // Mock order data - in a real app, this would be fetched from your database
@@ -19,6 +20,7 @@ const mockOrders: Order[] = [
 
 
 function NegotiateContent() {
+    const { t } = useI18n();
     const searchParams = useSearchParams();
     const { toast } = useToast();
     const orderId = searchParams.get('orderId');
@@ -29,7 +31,7 @@ function NegotiateContent() {
     useEffect(() => {
         if (!orderId) {
             setLoading(false);
-            toast({ variant: "destructive", title: "Error", description: "No order ID provided." });
+            toast({ variant: "destructive", title: t('error'), description: t('noOrderIdProvided') });
             return;
         }
 
@@ -38,11 +40,11 @@ function NegotiateContent() {
         if (foundOrder) {
             setOrder(foundOrder);
         } else {
-            toast({ variant: "destructive", title: "Error", description: "Order not found." });
+            toast({ variant: "destructive", title: t('error'), description: t('orderNotFound') });
         }
         setLoading(false);
 
-    }, [orderId, toast]);
+    }, [orderId, toast, t]);
 
     if (!order && !loading) {
         return null;
@@ -53,18 +55,19 @@ function NegotiateContent() {
             order={order}
             isLoading={loading}
             backLinkHref="/distributor"
-            backLinkText="Back to Dashboard"
-            chatDescription={`Conversation with the farmer for order to customer: ${order?.customer}.`}
-            quickReply1={`I can offer ₹${(order ? order.amount * 0.9 : 0).toLocaleString()} for this order.`}
-            quickReply2={`My final offer is ₹${(order ? order.amount * 0.95 : 0).toLocaleString()}.`}
-            onAcceptOffer={() => toast({title: "Offer Accepted!", description: "You have accepted the farmer's price."})}
+            backLinkText={t('backToDashboard')}
+            chatDescription={`${t('conversationWith')} ${t('theFarmer')} for order to customer: ${order?.customer}.`}
+            quickReply1={`${t('iCanOffer')} ₹${(order ? order.amount * 0.9 : 0).toLocaleString()}`}
+            quickReply2={`${t('myFinalOfferIs')} ₹${(order ? order.amount * 0.95 : 0).toLocaleString()}`}
+            onAcceptOffer={() => toast({title: t('offerAccepted'), description: t('youHaveAcceptedFarmerPrice')})}
         />
     );
 }
 
 export default function DistributorNegotiatePage() {
+    const { t } = useI18n();
     return (
-        <Suspense fallback={<DashboardCard title="Loading..."><Skeleton className="h-96 w-full" /></DashboardCard>}>
+        <Suspense fallback={<DashboardCard title={`${t('loading')}...`}><Skeleton className="h-96 w-full" /></DashboardCard>}>
             <NegotiateContent />
         </Suspense>
     );

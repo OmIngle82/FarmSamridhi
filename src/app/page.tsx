@@ -1,3 +1,4 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,24 +15,32 @@ export default function Home() {
       icon: <Tractor className="h-12 w-12 text-primary" />,
       description: 'Manage your products, orders, and finances.',
       href: '/farmer',
+      key: 'roleFarmer',
+      descriptionKey: 'roleFarmerDescription'
     },
     {
       name: 'Distributor',
       icon: <Truck className="h-12 w-12 text-primary" />,
       description: 'Source from verified farmers and manage logistics.',
       href: '/distributor',
+      key: 'roleDistributor',
+      descriptionKey: 'roleDistributorDescription'
     },
     {
       name: 'Retailer',
       icon: <Store className="h-12 w-12 text-primary" />,
       description: 'Procure traceable products for your customers.',
       href: '/retailer',
+      key: 'roleRetailer',
+      descriptionKey: 'roleRetailerDescription'
     },
     {
       name: 'Consumer',
       icon: <User className="h-12 w-12 text-primary" />,
       description: 'Trace your food, connect with farmers.',
       href: '/consumer',
+      key: 'roleConsumer',
+      descriptionKey: 'roleConsumerDescription'
     },
   ];
 

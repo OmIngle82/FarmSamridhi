@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft, Send, Loader2 } from 'lucide-react'
 import { db } from '@/lib/firebase';
 import { useAuth } from '@/contexts/auth-context'
+import { useI18n } from '@/contexts/i18n-context'
 
 interface Message {
   id?: string;
@@ -36,6 +37,7 @@ interface NegotiationChatProps {
 
 export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, chatDescription, quickReply1, quickReply2, onAcceptOffer }: NegotiationChatProps) {
     const { user } = useAuth();
+    const { t } = useI18n();
     const { toast } = useToast();
     
     const [messages, setMessages] = useState<Message[]>([]);
@@ -63,11 +65,11 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
             setMessages(msgs);
         }, (error) => {
             console.error("Error fetching messages:", error);
-            toast({ variant: "destructive", title: "Error", description: "Could not load chat history." });
+            toast({ variant: "destructive", title: t('error'), description: t('chatHistoryError') });
         });
 
         return () => unsubscribe();
-    }, [order?.id, toast]);
+    }, [order?.id, toast, t]);
 
 
     useEffect(() => {
@@ -89,7 +91,7 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
             setNewMessage("");
         } catch (error) {
             console.error("Error sending message:", error);
-            toast({ variant: "destructive", title: "Error", description: "Message could not be sent." });
+            toast({ variant: "destructive", title: t('error'), description: t('sendMessageError') });
         } finally {
             setIsSending(false);
         }
@@ -103,7 +105,7 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
 
     if (isLoading) {
         return (
-            <DashboardCard title="Loading Negotiation..." description="Please wait...">
+            <DashboardCard title={t('loadingNegotiation')} description={t('pleaseWait')}>
                 <Skeleton className="h-96 w-full" />
             </DashboardCard>
         );
@@ -111,7 +113,7 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
     
     if (!order) {
          return (
-            <DashboardCard title="Order Not Found" description="The requested order could not be found.">
+            <DashboardCard title={t('orderNotFound')} description={t('orderNotFoundDescription')}>
                 <Button asChild variant="outline">
                     <Link href={backLinkHref}><ArrowLeft className="mr-2 h-4 w-4" />{backLinkText}</Link>
                 </Button>
@@ -121,14 +123,14 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
 
     return (
         <DashboardCard
-            title={`Negotiating Order: ${order.id}`}
+            title={`${t('negotiatingOrder')}: ${order.id}`}
             description={chatDescription}
         >
             <div className="flex flex-col h-[65vh]">
                 <div className="flex-grow overflow-y-auto p-4 border rounded-t-lg bg-muted/20 space-y-4">
                     {messages.length === 0 && (
                         <div className="flex items-center justify-center h-full text-muted-foreground">
-                            <p>No messages yet. Start the conversation!</p>
+                            <p>{t('noMessagesYet')}</p>
                         </div>
                     )}
                     {messages.map((msg, index) => (
@@ -144,12 +146,12 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
                      <div className="flex gap-2 mb-4">
                         <Button variant="outline" size="sm" onClick={() => handleQuickReply(quickReply1)}>{quickReply1}</Button>
                         <Button variant="outline" size="sm" onClick={() => handleQuickReply(quickReply2)}>{quickReply2}</Button>
-                        <Button variant="secondary" size="sm" onClick={onAcceptOffer}>Accept Offer</Button>
+                        <Button variant="secondary" size="sm" onClick={onAcceptOffer}>{t('acceptOffer')}</Button>
                     </div>
                     <div className="flex gap-2">
                         <Input
                             id="chat-input"
-                            placeholder="Type your message..." 
+                            placeholder={t('typeYourMessage')}
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
@@ -157,7 +159,7 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
                         />
                         <Button onClick={handleSendMessage} disabled={isSending || !newMessage.trim()}>
                             {isSending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
-                            <span className="sr-only">Send</span>
+                            <span className="sr-only">{t('send')}</span>
                         </Button>
                     </div>
                 </div>

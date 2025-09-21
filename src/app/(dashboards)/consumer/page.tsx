@@ -20,8 +20,10 @@ import { getProductJourney, type ProductJourneyData } from '@/ai/flows/journey-f
 import { ProductJourney } from '@/components/product-journey'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'
+import { useI18n } from '@/contexts/i18n-context'
 
 export default function ConsumerDashboard() {
+  const { t } = useI18n();
   const { toast } = useToast()
   const [isScanning, setIsScanning] = useState(false)
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null)
@@ -110,8 +112,8 @@ export default function ConsumerDashboard() {
           setHasCameraPermission(false);
           toast({
             variant: 'destructive',
-            title: 'Camera Access Denied',
-            description: 'Please enable camera permissions in your browser settings.',
+            title: t('cameraAccessDenied'),
+            description: t('enableCameraPermissions'),
           });
           setIsScanning(false)
         }
@@ -128,7 +130,7 @@ export default function ConsumerDashboard() {
           cancelAnimationFrame(animationFrameId);
       }
     }
-  }, [isScanning, toast]);
+  }, [isScanning, toast, t]);
 
 
   const handleSimulateScan = () => {
@@ -151,7 +153,7 @@ export default function ConsumerDashboard() {
 
   if (isFetchingJourney) {
     return (
-      <DashboardCard title="Tracing Product Journey..." description="Fetching the story of your food from farm to table.">
+      <DashboardCard title={t('tracingProductJourney')} description={t('fetchingJourneyDescription')}>
         <div className="space-y-6">
           <Skeleton className="h-24 w-full" />
           <Skeleton className="h-48 w-full" />
@@ -170,21 +172,21 @@ export default function ConsumerDashboard() {
   return (
     <>
       <DashboardCard
-        title="Trace Your Food's Journey"
-        description="Scan the QR code on your product to discover its story, from the farm to your hands. See the farmers who grew it, the path it traveled, and key milestones along the way."
+        title={t('traceYourFoodJourney')}
+        description={t('scanQrDescription')}
       >
         <div className="flex flex-col gap-4 items-center justify-center text-center h-full p-8">
             <QrCode className="w-24 h-24 text-primary" strokeWidth={1} />
-            <h3 className="text-2xl font-semibold mt-4">Ready to Scan</h3>
+            <h3 className="text-2xl font-semibold mt-4">{t('readyToScan')}</h3>
             <p className="text-muted-foreground max-w-sm">
-                Position the product's QR code in front of your camera to trace its origin.
+                {t('positionQrCode')}
             </p>
           <div className="flex gap-4 mt-6">
             <Button size="lg" onClick={handleStartScan}>
-                <Camera className="mr-2 h-5 w-5" /> Start Scanning
+                <Camera className="mr-2 h-5 w-5" /> {t('startScanning')}
             </Button>
             <Button size="lg" variant="outline" onClick={handleSimulateScan}>
-                <ScanLine className="mr-2 h-5 w-5" /> Simulate Scan
+                <ScanLine className="mr-2 h-5 w-5" /> {t('simulateScan')}
             </Button>
           </div>
         </div>
@@ -193,9 +195,9 @@ export default function ConsumerDashboard() {
       <AlertDialog open={isScanning} onOpenChange={setIsScanning}>
         <AlertDialogContent className="max-w-2xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Scan Product QR Code</AlertDialogTitle>
+            <AlertDialogTitle>{t('scanProductQrCode')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Center the QR code within the frame to automatically scan it.
+              {t('centerQrCode')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="relative w-full aspect-video bg-muted rounded-md overflow-hidden">
@@ -207,9 +209,9 @@ export default function ConsumerDashboard() {
              {hasCameraPermission === false && (
                 <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
                     <Alert variant="destructive" className="w-3/4">
-                        <AlertTitle>Camera Access Required</AlertTitle>
+                        <AlertTitle>{t('cameraAccessRequired')}</AlertTitle>
                         <AlertDescription>
-                            Please allow camera access in your browser to use this feature. You may need to refresh the page after granting permission.
+                           {t('allowCameraAccess')}
                         </AlertDescription>
                     </Alert>
                 </div>
@@ -217,7 +219,7 @@ export default function ConsumerDashboard() {
           </div>
           <AlertDialogFooter>
             <Button variant="outline" onClick={handleCloseScanner}>
-                <X className="mr-2 h-4 w-4" /> Cancel
+                <X className="mr-2 h-4 w-4" /> {t('cancel')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

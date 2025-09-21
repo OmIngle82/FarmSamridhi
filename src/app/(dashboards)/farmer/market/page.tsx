@@ -17,20 +17,22 @@ import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
-
-const chartConfig = {
-  price: {
-    label: "Current MSP (₹/quintal)",
-    color: "hsl(var(--chart-1))",
-  },
-  target: {
-    label: "Target Price (₹/quintal)",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig
+import { useI18n } from '@/contexts/i18n-context'
 
 export default function FarmerMarketPage() {
+  const { t } = useI18n();
   const { toast } = useToast()
+
+  const chartConfig = {
+    price: {
+      label: t('currentMSP'),
+      color: "hsl(var(--chart-1))",
+    },
+    target: {
+      label: t('targetPrice'),
+      color: "hsl(var(--chart-2))",
+    },
+  } satisfies ChartConfig
 
   const { data: marketPrices, isLoading: loading, error } = useQuery({
     queryKey: ['farmerData'],
@@ -43,22 +45,22 @@ export default function FarmerMarketPage() {
         console.error("Failed to fetch market prices:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load market prices.",
+          title: t('error'),
+          description: t('marketPricesError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
 
   return (
     <DashboardCard
-      title="Live Market Prices (MSP)"
-      description="Current Minimum Support Prices for key crops across the market."
+      title={t('liveMarketPrices')}
+      description={t('currentMSPsForCrops')}
     >
       {loading ? (
         <Skeleton className="h-96 w-full" />
       ) : !marketPrices || marketPrices.length === 0 ? (
-         <div className="text-center text-muted-foreground py-12">No market data available.</div>
+         <div className="text-center text-muted-foreground py-12">{t('noMarketData')}</div>
       ) : (
         <ChartContainer config={chartConfig} className="min-h-[400px] w-full">
           <BarChart accessibilityLayer data={marketPrices}>

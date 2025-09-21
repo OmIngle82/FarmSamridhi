@@ -16,6 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/hooks/use-toast"
 import { useAuth, type UserRole } from "@/contexts/auth-context"
 import { Leaf, LogIn } from "lucide-react"
+import { useI18n } from '@/contexts/i18n-context'
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -34,6 +35,7 @@ type SignupFormData = z.infer<typeof signupSchema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const { t } = useI18n();
   const { toast } = useToast()
   const { login, signup } = useAuth()
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -52,10 +54,10 @@ export default function LoginPage() {
     setIsSubmitting(true)
     const user = await login(data.email, data.password)
     if (user) {
-      toast({ title: "Login Successful", description: `Welcome back, ${user.name}!` })
+      toast({ title: t('loginSuccessTitle'), description: t('welcomeBack', { name: user.name }) })
       router.push(`/${user.role}`)
     } else {
-      toast({ variant: "destructive", title: "Login Failed", description: "Invalid email or password." })
+      toast({ variant: "destructive", title: t('loginFailedTitle'), description: t('invalidCredentials') })
       setIsSubmitting(false)
     }
   }
@@ -64,10 +66,10 @@ export default function LoginPage() {
     setIsSubmitting(true)
     const user = await signup(data)
     if (user) {
-      toast({ title: "Signup Successful", description: "Welcome to FarmSamridhi!" })
+      toast({ title: t('signupSuccessTitle'), description: t('welcomeToFarmSamridhi') })
       router.push(`/${user.role}`)
     } else {
-      toast({ variant: "destructive", title: "Signup Failed", description: "An account with this email already exists." })
+      toast({ variant: "destructive", title: t('signupFailedTitle'), description: t('accountExistsError') })
       setIsSubmitting(false)
     }
   }
@@ -82,29 +84,29 @@ export default function LoginPage() {
             </Link>
         </div>
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <TabsTrigger value="login">{t('login')}</TabsTrigger>
+          <TabsTrigger value="signup">{t('signUp')}</TabsTrigger>
         </TabsList>
         <TabsContent value="login">
           <Card>
             <CardHeader>
-              <CardTitle>Login</CardTitle>
-              <CardDescription>Enter your credentials to access your dashboard.</CardDescription>
+              <CardTitle>{t('login')}</CardTitle>
+              <CardDescription>{t('loginDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="login-email">Email</Label>
+                  <Label htmlFor="login-email">{t('email')}</Label>
                   <Input id="login-email" type="email" placeholder="user@example.com" {...loginForm.register("email")} />
                   {loginForm.formState.errors.email && <p className="text-sm text-destructive">{loginForm.formState.errors.email.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="login-password">Password</Label>
+                  <Label htmlFor="login-password">{t('password')}</Label>
                   <Input id="login-password" type="password" {...loginForm.register("password")} />
                   {loginForm.formState.errors.password && <p className="text-sm text-destructive">{loginForm.formState.errors.password.message}</p>}
                 </div>
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                    {isSubmitting ? "Logging in..." : "Login"}
+                    {isSubmitting ? t('loggingIn') : t('login')}
                 </Button>
               </form>
             </CardContent>
@@ -113,37 +115,37 @@ export default function LoginPage() {
         <TabsContent value="signup">
           <Card>
             <CardHeader>
-              <CardTitle>Sign Up</CardTitle>
-              <CardDescription>Create an account to get started.</CardDescription>
+              <CardTitle>{t('signUp')}</CardTitle>
+              <CardDescription>{t('signupDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="signup-name">Full Name</Label>
-                  <Input id="signup-name" placeholder="Your Name" {...signupForm.register("name")} />
+                  <Label htmlFor="signup-name">{t('fullName')}</Label>
+                  <Input id="signup-name" placeholder={t('yourName')} {...signupForm.register("name")} />
                   {signupForm.formState.errors.name && <p className="text-sm text-destructive">{signupForm.formState.errors.name.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-email">Email</Label>
+                  <Label htmlFor="signup-email">{t('email')}</Label>
                   <Input id="signup-email" type="email" placeholder="user@example.com" {...signupForm.register("email")} />
                    {signupForm.formState.errors.email && <p className="text-sm text-destructive">{signupForm.formState.errors.email.message}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="signup-password">Password</Label>
+                  <Label htmlFor="signup-password">{t('password')}</Label>
                   <Input id="signup-password" type="password" {...signupForm.register("password")} />
                    {signupForm.formState.errors.password && <p className="text-sm text-destructive">{signupForm.formState.errors.password.message}</p>}
                 </div>
                  <div className="space-y-2">
-                    <Label>I am a...</Label>
+                    <Label>{t('iAmA')}</Label>
                     <select {...signupForm.register("role")} className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                        <option value="farmer">Farmer</option>
-                        <option value="distributor">Distributor</option>
-                        <option value="retailer">Retailer</option>
-                        <option value="consumer">Consumer</option>
+                        <option value="farmer">{t('roleFarmer')}</option>
+                        <option value="distributor">{t('roleDistributor')}</option>
+                        <option value="retailer">{t('roleRetailer')}</option>
+                        <option value="consumer">{t('roleConsumer')}</option>
                     </select>
                 </div>
                 <Button type="submit" className="w-full" disabled={isSubmitting}>
-                   {isSubmitting ? "Creating account..." : "Create Account"}
+                   {isSubmitting ? t('creatingAccount') : t('createAccount')}
                 </Button>
               </form>
             </CardContent>

@@ -20,8 +20,10 @@ import { getFarmerData, type Order } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useI18n } from '@/contexts/i18n-context'
 
 function OrdersContent() {
+  const { t } = useI18n();
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const pathname = usePathname()
@@ -46,11 +48,11 @@ function OrdersContent() {
         console.error("Failed to fetch orders:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load orders.",
+          title: t('error'),
+          description: t('ordersError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
   const handleTabChange = (value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -65,29 +67,29 @@ function OrdersContent() {
 
   return (
     <DashboardCard
-      title="All Orders"
-      description="A complete history of all your orders."
+      title={t('allOrders')}
+      description={t('completeOrderHistory')}
     >
         <Tabs value={statusFilter} onValueChange={handleTabChange} className="mb-4">
             <TabsList>
-                <TabsTrigger value="all">All Orders</TabsTrigger>
-                <TabsTrigger value="pending">Pending</TabsTrigger>
-                <TabsTrigger value="shipped">Shipped</TabsTrigger>
+                <TabsTrigger value="all">{t('allOrders')}</TabsTrigger>
+                <TabsTrigger value="pending">{t('pending')}</TabsTrigger>
+                <TabsTrigger value="shipped">{t('shipped')}</TabsTrigger>
             </TabsList>
         </Tabs>
       {loading ? (
         <Skeleton className="h-60 w-full" />
       ) : !orders || orders.length === 0 ? (
-        <div className="text-center text-muted-foreground py-12">No {statusFilter !== 'all' ? statusFilter : ''} orders found.</div>
+        <div className="text-center text-muted-foreground py-12">{t('no')} {statusFilter !== 'all' ? t(statusFilter as any) : ''} {t('ordersFound')}.</div>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('orderId')}</TableHead>
+              <TableHead>{t('customer')}</TableHead>
+              <TableHead>{t('amount')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead className="text-right">{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -97,12 +99,14 @@ function OrdersContent() {
                 <TableCell>{order.customer}</TableCell>
                 <TableCell>₹{order.amount.toLocaleString()}</TableCell>
                 <TableCell>
-                  <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>{order.status}</Badge>
+                  <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>
+                    {t(order.status.toLowerCase() as any) || order.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/farmer/negotiate?orderId=${order.id}`}><MessageSquare className="mr-2 h-4 w-4"/>Negotiate</Link>
+                          <Link href={`/farmer/negotiate?orderId=${order.id}`}><MessageSquare className="mr-2 h-4 w-4"/>{t('negotiate')}</Link>
                         </Button>
                         <a href={`tel:${order.phone}`}>
                           <Button variant="outline" size="icon" className="h-9 w-9"><Phone className="h-4 w-4"/></Button>

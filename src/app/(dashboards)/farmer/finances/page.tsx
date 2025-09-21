@@ -50,9 +50,11 @@ import { CalendarIcon } from "lucide-react"
 import { Calendar } from "@/components/ui/calendar"
 import { format } from "date-fns"
 import { cn } from "@/lib/utils"
+import { useI18n } from '@/contexts/i18n-context'
 
 
 export default function FarmerFinancesPage() {
+  const { t } = useI18n();
   const { toast } = useToast()
   const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false)
   const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false)
@@ -70,11 +72,11 @@ export default function FarmerFinancesPage() {
         console.error("Failed to fetch financial data:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load financial data.",
+          title: t('error'),
+          description: t('financialDataError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
 
   const totalIncome = payments?.reduce((acc, p) => acc + p.amount, 0) || 0
@@ -83,8 +85,8 @@ export default function FarmerFinancesPage() {
     event.preventDefault();
     setIsLoanDialogOpen(false);
     toast({
-        title: "Loan Application Submitted",
-        description: "Your application has been received and is under review."
+        title: t('loanAppSubmitted'),
+        description: t('loanAppUnderReview')
     });
   }
   
@@ -92,22 +94,22 @@ export default function FarmerFinancesPage() {
     event.preventDefault();
     setIsExpenseSheetOpen(false);
     toast({
-        title: "Expense Added",
-        description: "Your expense has been successfully recorded."
+        title: t('expenseAdded'),
+        description: t('expenseRecordedSuccess')
     });
   }
 
   const handleDownloadReport = () => {
-    let reportContent = "Financial Report\n";
+    let reportContent = `${t('financialReport')}\n`;
     reportContent += "====================\n\n";
-    reportContent += `Total Income: ₹${totalIncome.toLocaleString()}\n\n`;
-    reportContent += "All Payments:\n";
+    reportContent += `${t('totalIncome')}: ₹${totalIncome.toLocaleString()}\n\n`;
+    reportContent += `${t('allPayments')}:\n`;
     if (payments) {
         payments.forEach(p => {
-            reportContent += `- ID: ${p.id}, From: ${p.from}, Amount: ₹${p.amount.toLocaleString()}, Date: ${p.date}\n`;
+            reportContent += `- ID: ${p.id}, ${t('from')}: ${p.from}, ${t('amount')}: ₹${p.amount.toLocaleString()}, ${t('date')}: ${p.date}\n`;
         });
     } else {
-        reportContent += "No payments recorded.\n";
+        reportContent += `${t('noPaymentsRecorded')}.\n`;
     }
 
     const blob = new Blob([reportContent], { type: 'text/plain' });
@@ -120,8 +122,8 @@ export default function FarmerFinancesPage() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     toast({
-        title: "Report Downloaded",
-        description: "Your financial report has been saved as a text file.",
+        title: t('reportDownloaded'),
+        description: t('financialReportSaved'),
     });
   };
 
@@ -129,12 +131,12 @@ export default function FarmerFinancesPage() {
     <>
     <div className="grid gap-6 md:gap-8">
         <DashboardCard
-            title="Financial Overview"
-            description="Manage your finances, loans, and subsidies."
+            title={t('financialOverview')}
+            description={t('manageFinancesLoansSubsidies')}
         >
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="border p-4 rounded-lg">
-                    <h3 className="text-sm font-medium text-muted-foreground">Total Income</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground">{t('totalIncome')}</h3>
                     <div className="text-2xl font-bold">
                         {loading ? (
                             <Skeleton className="h-8 w-32 mt-1" />
@@ -144,50 +146,50 @@ export default function FarmerFinancesPage() {
                     </div>
                 </div>
                 <div className="border p-4 rounded-lg">
-                    <h3 className="text-sm font-medium text-muted-foreground">Active Loans</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground">{t('activeLoans')}</h3>
                     <div className="text-2xl font-bold">₹0</div>
-                     <p className="text-xs text-muted-foreground">No active loans</p>
+                     <p className="text-xs text-muted-foreground">{t('noActiveLoans')}</p>
                 </div>
                  <div className="border p-4 rounded-lg">
-                    <h3 className="text-sm font-medium text-muted-foreground">Subsidies Received</h3>
+                    <h3 className="text-sm font-medium text-muted-foreground">{t('subsidiesReceived')}</h3>
                     <div className="text-2xl font-bold">₹5,000</div>
-                    <p className="text-xs text-muted-foreground">from Govt. Subsidy</p>
+                    <p className="text-xs text-muted-foreground">{t('from')} Govt. Subsidy</p>
                 </div>
             </div>
              <div className="flex gap-4 mt-6">
                 <Button onClick={() => setIsLoanDialogOpen(true)}>
-                    <DollarSign className="mr-2 h-4 w-4" /> Apply for Loan
+                    <DollarSign className="mr-2 h-4 w-4" /> {t('applyForLoan')}
                 </Button>
                 <Button variant="outline" onClick={() => setIsExpenseSheetOpen(true)}>
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
+                    <PlusCircle className="mr-2 h-4 w-4" /> {t('addExpense')}
                 </Button>
                 <Button variant="outline" onClick={handleDownloadReport}>
-                    <Download className="mr-2 h-4 w-4" /> Download Report
+                    <Download className="mr-2 h-4 w-4" /> {t('downloadReport')}
                 </Button>
             </div>
         </DashboardCard>
 
         <DashboardCard
-            title="All Payments"
-            description="A complete history of all your received payments."
+            title={t('allPayments')}
+            description={t('completePaymentHistory')}
         >
         {loading ? (
             <Skeleton className="h-60 w-full" />
         ) : !payments || payments.length === 0 ? (
-            <div className="text-center text-muted-foreground py-12">No payments found.</div>
+            <div className="text-center text-muted-foreground py-12">{t('noPaymentsFound')}</div>
         ) : (
             <Table>
             <TableHeader>
                 <TableRow>
-                <TableHead>Payment ID</TableHead>
-                <TableHead>From</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead className="text-right">Date</TableHead>
+                <TableHead>{t('paymentId')}</TableHead>
+                <TableHead>{t('from')}</TableHead>
+                <TableHead>{t('amount')}</TableHead>
+                <TableHead className="text-right">{t('date')}</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
                 {payments.map((payment) => (
-                <TableRow key={payment.id} onClick={() => toast({ title: 'View Details (Demo)', description: 'In a real app, this would open a detailed view for the payment.'})} className="cursor-pointer">
+                <TableRow key={payment.id} onClick={() => toast({ title: t('viewDetailsDemoTitle'), description: t('viewDetailsDemoDescription')})} className="cursor-pointer">
                     <TableCell className="font-medium">{payment.id}</TableCell>
                     <TableCell>{payment.from}</TableCell>
                     <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
@@ -203,31 +205,31 @@ export default function FarmerFinancesPage() {
     <Dialog open={isLoanDialogOpen} onOpenChange={setIsLoanDialogOpen}>
         <DialogContent>
             <DialogHeader>
-                <DialogTitle>Apply for Agri-Loan Express</DialogTitle>
+                <DialogTitle>{t('applyForAgriLoan')}</DialogTitle>
                 <DialogDescription>
-                    Fill in the details below to apply for a loan. We'll get back to you within 2-3 business days.
+                    {t('fillLoanDetails')}
                 </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleLoanSubmit}>
                 <div className="grid gap-4 py-4">
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="loan-amount" className="text-right">
-                            Amount (₹)
+                            {t('amount')} (₹)
                         </Label>
                         <Input id="loan-amount" type="number" defaultValue="10000" className="col-span-3" required/>
                     </div>
                     <div className="grid grid-cols-4 items-center gap-4">
                         <Label htmlFor="loan-purpose" className="text-right">
-                            Purpose
+                            {t('purpose')}
                         </Label>
-                        <Textarea id="loan-purpose" placeholder="e.g., Buying seeds, new equipment, etc." className="col-span-3" required/>
+                        <Textarea id="loan-purpose" placeholder={t('loanPurposePlaceholder')} className="col-span-3" required/>
                     </div>
                 </div>
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button type="button" variant="secondary">Cancel</Button>
+                        <Button type="button" variant="secondary">{t('cancel')}</Button>
                     </DialogClose>
-                    <Button type="submit">Submit Application</Button>
+                    <Button type="submit">{t('submitApplication')}</Button>
                 </DialogFooter>
             </form>
         </DialogContent>
@@ -236,35 +238,35 @@ export default function FarmerFinancesPage() {
     <Sheet open={isExpenseSheetOpen} onOpenChange={setIsExpenseSheetOpen}>
         <SheetContent>
             <SheetHeader>
-                <SheetTitle>Add a New Expense</SheetTitle>
+                <SheetTitle>{t('addNewExpense')}</SheetTitle>
                 <SheetDescription>
-                    Keep track of your farm's expenses to better manage your finances.
+                    {t('keepTrackOfExpenses')}
                 </SheetDescription>
             </SheetHeader>
             <form onSubmit={handleExpenseSubmit}>
                 <div className="grid gap-4 py-4">
                     <div className="space-y-2">
-                        <Label htmlFor="expense-category">Category</Label>
+                        <Label htmlFor="expense-category">{t('category')}</Label>
                         <Select required>
                             <SelectTrigger id="expense-category">
-                                <SelectValue placeholder="Select a category" />
+                                <SelectValue placeholder={t('selectCategory')} />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="seeds">Seeds</SelectItem>
-                                <SelectItem value="fertilizer">Fertilizer</SelectItem>
-                                <SelectItem value="pesticides">Pesticides</SelectItem>
-                                <SelectItem value="labor">Labor</SelectItem>
-                                <SelectItem value="equipment">Equipment</SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
+                                <SelectItem value="seeds">{t('seeds')}</SelectItem>
+                                <SelectItem value="fertilizer">{t('fertilizer')}</SelectItem>
+                                <SelectItem value="pesticides">{t('pesticides')}</SelectItem>
+                                <SelectItem value="labor">{t('labor')}</SelectItem>
+                                <SelectItem value="equipment">{t('equipment')}</SelectItem>
+                                <SelectItem value="other">{t('other')}</SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="expense-amount">Amount (₹)</Label>
+                        <Label htmlFor="expense-amount">{t('amount')} (₹)</Label>
                         <Input id="expense-amount" type="number" placeholder="5000" required />
                     </div>
                     <div className="space-y-2">
-                        <Label htmlFor="expense-date">Date of Expense</Label>
+                        <Label htmlFor="expense-date">{t('dateOfExpense')}</Label>
                         <Popover>
                             <PopoverTrigger asChild>
                                 <Button
@@ -275,7 +277,7 @@ export default function FarmerFinancesPage() {
                                 )}
                                 >
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {expenseDate ? format(expenseDate, "PPP") : <span>Pick a date</span>}
+                                {expenseDate ? format(expenseDate, "PPP") : <span>{t('pickADate')}</span>}
                                 </Button>
                             </PopoverTrigger>
                             <PopoverContent className="w-auto p-0">
@@ -291,9 +293,9 @@ export default function FarmerFinancesPage() {
                 </div>
                 <SheetFooter>
                     <SheetClose asChild>
-                        <Button type="button" variant="secondary">Cancel</Button>
+                        <Button type="button" variant="secondary">{t('cancel')}</Button>
                     </SheetClose>
-                    <Button type="submit">Save Expense</Button>
+                    <Button type="submit">{t('saveExpense')}</Button>
                 </SheetFooter>
             </form>
         </SheetContent>

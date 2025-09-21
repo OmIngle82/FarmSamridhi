@@ -38,6 +38,7 @@ import { suggestProductDetails } from "@/ai/flows/suggest-product-details-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Upload, X, Trash2, Edit, Sparkles, Loader2 } from "lucide-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useI18n } from '@/contexts/i18n-context'
 
 const productSchema = z.object({
   id: z.string().optional(),
@@ -51,6 +52,7 @@ const productSchema = z.object({
 type ProductFormData = z.infer<typeof productSchema>
 
 function ProductsPageContent() {
+  const { t } = useI18n();
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
@@ -71,22 +73,22 @@ function ProductsPageContent() {
         console.error("Failed to fetch products:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load products.",
+          title: t('error'),
+          description: t('productsError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
   const addProductMutation = useMutation({
     mutationFn: (newProduct: Omit<ProductFormData, 'id'>) => addProduct({ farmerId: "FARM001", ...newProduct }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['farmerData'] });
-      toast({ title: "Success", description: "Product added successfully." });
+      toast({ title: t('success'), description: t('productAddedSuccess') });
       resetForm();
     },
     onError: (error) => {
       console.error("Failed to add product:", error)
-      toast({ variant: "destructive", title: "Error", description: "Could not add product." });
+      toast({ variant: "destructive", title: t('error'), description: t('addProductError') });
     },
   });
 
@@ -94,12 +96,12 @@ function ProductsPageContent() {
     mutationFn: (updatedProduct: Product) => updateProduct(updatedProduct),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['farmerData'] });
-      toast({ title: "Success", description: "Product updated successfully." });
+      toast({ title: t('success'), description: t('productUpdatedSuccess') });
       resetForm();
     },
     onError: (error) => {
       console.error("Failed to update product:", error);
-      toast({ variant: "destructive", title: "Error", description: "Could not update product." });
+      toast({ variant: "destructive", title: t('error'), description: t('updateProductError') });
     },
   });
 
@@ -107,11 +109,11 @@ function ProductsPageContent() {
     mutationFn: (productId: string) => deleteProduct({ productId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['farmerData'] });
-      toast({ title: "Success", description: "Product deleted successfully." });
+      toast({ title: t('success'), description: t('productDeletedSuccess') });
     },
     onError: (error) => {
       console.error("Failed to delete product:", error);
-      toast({ variant: "destructive", title: "Error", description: "Could not delete product." });
+      toast({ variant: "destructive", title: t('error'), description: t('deleteProductError') });
     },
   });
 
@@ -134,8 +136,8 @@ function ProductsPageContent() {
             suggestionAppliedRef.current = true;
             form.setValue("name", newProductName);
             toast({
-                title: "Add New Product",
-                description: `Generating suggestions for "${newProductName}"...`,
+                title: t('addNewProduct'),
+                description: `${t('generatingSuggestionsFor')} "${newProductName}"...`,
             });
 
             const getSuggestions = async () => {
@@ -146,15 +148,15 @@ function ProductsPageContent() {
                     form.setValue("image", suggestions.imageUrl);
                     setImagePreview(suggestions.imageUrl);
                     toast({
-                        title: "Suggestions Applied!",
-                        description: "We've filled in a description and image for you.",
+                        title: t('suggestionsApplied'),
+                        description: t('suggestionsAppliedDescription'),
                     });
                 } catch (err) {
                     console.error("Failed to get suggestions:", err);
                     toast({
                         variant: "destructive",
-                        title: "Suggestion Failed",
-                        description: "Could not generate AI suggestions. Please fill in the details manually.",
+                        title: t('suggestionFailed'),
+                        description: t('suggestionFailedDescription'),
                     });
                 } finally {
                     setIsSuggesting(false);
@@ -164,7 +166,7 @@ function ProductsPageContent() {
             getSuggestions();
         }
     }
-  }, [searchParams, form, toast, isEditing]);
+  }, [searchParams, form, toast, isEditing, t]);
 
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -225,14 +227,14 @@ function ProductsPageContent() {
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
       <DashboardCard
-        title={isEditing ? "Edit Product" : "Add a New Product"}
-        description={isEditing ? "Update the details for this item." : "Fill out the details to list a new item for sale."}
+        title={isEditing ? t('editProduct') : t('addNewProduct')}
+        description={isEditing ? t('updateProductItem') : t('fillProductDetails')}
         className="lg:col-span-1"
       >
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
              <div className="space-y-2">
-              <Label>Product Image</Label>
+              <Label>{t('productImage')}</Label>
               <Input
                 id="image-upload"
                 type="file"
@@ -272,12 +274,12 @@ function ProductsPageContent() {
                   {isSuggesting ? (
                     <>
                       <Sparkles className="h-8 w-8 animate-pulse text-primary" />
-                      <span className="text-muted-foreground mt-2">Generating image...</span>
+                      <span className="text-muted-foreground mt-2">{t('generatingImage')}</span>
                     </>
                   ) : (
                     <>
                       <Upload className="h-8 w-8 text-muted-foreground" />
-                      <span className="text-muted-foreground mt-2">Upload Image</span>
+                      <span className="text-muted-foreground mt-2">{t('uploadImage')}</span>
                     </>
                   )}
                 </Button>
@@ -289,9 +291,9 @@ function ProductsPageContent() {
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Product Name</FormLabel>
+                  <FormLabel>{t('productName')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g. Fresh Tomatoes" {...field} disabled={isMutating}/>
+                    <Input placeholder={t('productNamePlaceholder')} {...field} disabled={isMutating}/>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -303,12 +305,12 @@ function ProductsPageContent() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex justify-between items-center">
-                    <FormLabel>Description</FormLabel>
-                     {isSuggesting && <span className="text-xs text-muted-foreground">Generating...</span>}
+                    <FormLabel>{t('description')}</FormLabel>
+                     {isSuggesting && <span className="text-xs text-muted-foreground">{t('generating')}...</span>}
                   </div>
                   <FormControl>
                     <Textarea
-                      placeholder="e.g. Organically grown, hand-picked tomatoes from our farm."
+                      placeholder={t('productDescriptionPlaceholder')}
                       {...field}
                       disabled={isSuggesting || isMutating}
                     />
@@ -323,7 +325,7 @@ function ProductsPageContent() {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price (₹ per kg)</FormLabel>
+                    <FormLabel>{t('pricePerKg')}</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="25" {...field} disabled={isMutating}/>
                     </FormControl>
@@ -336,7 +338,7 @@ function ProductsPageContent() {
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity (kg)</FormLabel>
+                    <FormLabel>{t('quantity')} (kg)</FormLabel>
                     <FormControl>
                       <Input type="number" placeholder="500" {...field} disabled={isMutating}/>
                     </FormControl>
@@ -348,20 +350,20 @@ function ProductsPageContent() {
             <div className="flex gap-2">
                 {isEditing && (
                     <Button type="button" variant="secondary" className="w-full" onClick={resetForm} disabled={isMutating}>
-                        Cancel
+                        {t('cancel')}
                     </Button>
                 )}
                 <Button type="submit" className="w-full" disabled={isSuggesting || isMutating}>
                 {isMutating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {addProductMutation.isPending ? "Adding..." : updateProductMutation.isPending ? "Saving..." : isEditing ? "Save Changes" : "Add Product"}
+                {addProductMutation.isPending ? t('adding') : updateProductMutation.isPending ? t('saving') : isEditing ? t('saveChanges') : t('addProduct')}
                 </Button>
             </div>
           </form>
         </Form>
       </DashboardCard>
       <DashboardCard
-        title="My Products"
-        description="A list of all your current products."
+        title={t('myProducts')}
+        description={t('yourProductList')}
         className="lg:col-span-2"
       >
         {loading ? (
@@ -377,8 +379,8 @@ function ProductsPageContent() {
             </div>
         ) : products.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground py-12">
-            <p className="text-lg font-medium">No products yet.</p>
-            <p>Use the form on the left to add your first product.</p>
+            <p className="text-lg font-medium">{t('noProductsYet')}</p>
+            <p>{t('useFormToAddProduct')}</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -394,7 +396,7 @@ function ProductsPageContent() {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full bg-secondary text-muted-foreground">
-                      No Image
+                      {t('noImage')}
                     </div>
                   )}
                 </div>
@@ -403,30 +405,30 @@ function ProductsPageContent() {
                   <p className="text-sm text-muted-foreground h-10 overflow-hidden">{product.description}</p>
                   <div className="flex justify-between items-center mt-4">
                     <span className="font-bold text-xl">₹{product.price}/kg</span>
-                    <span className="text-sm text-muted-foreground">{product.quantity} kg available</span>
+                    <span className="text-sm text-muted-foreground">{product.quantity} {t('kgAvailable')}</span>
                   </div>
                   <div className="flex gap-2 mt-4">
                      <Button variant="outline" size="sm" className="w-full" onClick={() => handleEditClick(product)}>
-                        <Edit className="mr-2 h-4 w-4" /> Edit
+                        <Edit className="mr-2 h-4 w-4" /> {t('edit')}
                     </Button>
                     <AlertDialog>
                         <AlertDialogTrigger asChild>
                             <Button variant="destructive" size="sm" className="w-full">
-                                <Trash2 className="mr-2 h-4 w-4" /> Delete
+                                <Trash2 className="mr-2 h-4 w-4" /> {t('delete')}
                             </Button>
                         </AlertDialogTrigger>
                         <AlertDialogContent>
                             <AlertDialogHeader>
-                            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                            <AlertDialogTitle>{t('areYouSure')}</AlertDialogTitle>
                             <AlertDialogDescription>
-                                This action cannot be undone. This will permanently delete the product "{product.name}".
+                                {t('deleteProductWarning', { productName: product.name })}
                             </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                            <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                             <AlertDialogAction onClick={() => handleDeleteClick(product.id!)} disabled={deleteProductMutation.isPending}>
                                 {deleteProductMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                Delete
+                                {t('delete')}
                             </AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
@@ -443,11 +445,10 @@ function ProductsPageContent() {
 }
 
 export default function FarmerProductsPage() {
+    const { t } = useI18n();
     return (
-        <Suspense fallback={<DashboardCard title="Loading Products..."><Skeleton className="h-96 w-full" /></DashboardCard>}>
+        <Suspense fallback={<DashboardCard title={`${t('loading')} ${t('myProducts')}...`}><Skeleton className="h-96 w-full" /></DashboardCard>}>
             <ProductsPageContent />
         </Suspense>
     )
 }
-
-    

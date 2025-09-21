@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DashboardCard } from "@/components/dashboard-card"
 import type { ProductJourneyData } from "@/ai/flows/journey-flow"
 import { ArrowLeft, Sprout, Milestone, Truck, Warehouse, Store } from "lucide-react"
+import { useI18n } from "@/contexts/i18n-context"
 
 const iconMap: { [key: string]: React.ReactNode } = {
     seeding: <Sprout className="h-5 w-5 text-primary" />,
@@ -22,13 +23,15 @@ type ProductJourneyProps = {
     resetText?: string;
 }
 
-export function ProductJourney({ journeyData, onReset, resetText = "Scan Another" }: ProductJourneyProps) {
+export function ProductJourney({ journeyData, onReset, resetText }: ProductJourneyProps) {
+    const { t } = useI18n();
     const { product, farmer, journey } = journeyData;
+    const effectiveResetText = resetText || t('scanAnother');
 
     return (
          <DashboardCard 
-            title={`Journey of ${product.name}`}
-            description={`Product ID: ${product.id}`}
+            title={`${t('journeyOf')} ${product.name}`}
+            description={`${t('productId')}: ${product.id}`}
         >
             <div className="space-y-8">
                 <div className="flex flex-col sm:flex-row items-center gap-6 p-4 border rounded-lg bg-secondary/50">
@@ -37,16 +40,16 @@ export function ProductJourney({ journeyData, onReset, resetText = "Scan Another
                     </div>
                     <div className="flex-1">
                         <h3 className="font-semibold text-xl">{product.name}</h3>
-                        <p className="text-muted-foreground">Follow the complete journey of this product from the farm to your hands.</p>
+                        <p className="text-muted-foreground">{t('followJourney')}</p>
                     </div>
                      <Button onClick={onReset} variant="outline">
                         <ArrowLeft className="mr-2 h-4 w-4"/>
-                        {resetText}
+                        {effectiveResetText}
                     </Button>
                 </div>
 
                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg">Grown with care by</h3>
+                    <h3 className="font-semibold text-lg">{t('grownWithCareBy')}</h3>
                     <div className="flex items-center gap-4 p-4 border rounded-lg">
                         <Avatar className="h-16 w-16">
                             <AvatarImage src={farmer.avatar} alt={farmer.name} />
@@ -56,14 +59,14 @@ export function ProductJourney({ journeyData, onReset, resetText = "Scan Another
                             <p className="font-semibold">{farmer.name}</p>
                             <p className="text-sm text-muted-foreground">{farmer.location}</p>
                             <p className="text-xs text-muted-foreground">
-                                {farmer.farmSize} farm, member since {farmer.memberSince}
+                                {farmer.farmSize} farm, {t('memberSince')} {farmer.memberSince}
                             </p>
                         </div>
                     </div>
                 </div>
 
                 <div className="space-y-4">
-                    <h3 className="font-semibold text-lg">Timeline</h3>
+                    <h3 className="font-semibold text-lg">{t('timeline')}</h3>
                     <div className="relative pl-8">
                         {/* Vertical Line */}
                         <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-border"></div>
@@ -77,7 +80,7 @@ export function ProductJourney({ journeyData, onReset, resetText = "Scan Another
                             
                             <div className="pl-4">
                                 <p className="text-sm font-semibold text-primary">{step.date}</p>
-                                <h4 className="font-semibold">{step.title}</h4>
+                                <h4 className="font-semibold">{t(step.icon as any) || step.title}</h4>
                                 <p className="text-sm text-muted-foreground">{step.description}</p>
                                 <p className="text-xs text-muted-foreground mt-1">{step.location}</p>
                             </div>

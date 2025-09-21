@@ -10,6 +10,7 @@ import { Camera, Edit, Save, User, MapPin, Wheat, Milestone } from 'lucide-react
 import { useToast } from '@/hooks/use-toast'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useI18n } from '@/contexts/i18n-context'
 
 const farmerData = {
     name: "Suresh Patel",
@@ -22,6 +23,7 @@ const farmerData = {
 };
 
 export default function FarmerProfilePage() {
+    const { t } = useI18n();
     const { toast } = useToast()
     const [isEditing, setIsEditing] = useState(false);
     const [name, setName] = useState(farmerData.name);
@@ -31,8 +33,8 @@ export default function FarmerProfilePage() {
         setIsEditing(false);
         farmerData.name = name; // Update the mock data object
         toast({
-            title: "Profile Updated",
-            description: "Your profile information has been saved.",
+            title: t('profileUpdated'),
+            description: t('profileUpdatedSuccess'),
         });
     }
 
@@ -43,8 +45,8 @@ export default function FarmerProfilePage() {
 
     return (
         <DashboardCard
-            title="My Profile"
-            description="View and manage your personal and farm details."
+            title={t('myProfile')}
+            description={t('viewAndManageProfile')}
         >
             <div className="space-y-8">
                 <div className="flex items-center gap-6">
@@ -53,14 +55,14 @@ export default function FarmerProfilePage() {
                             {userAvatar && <AvatarImage src={userAvatar.imageUrl} alt={farmerData.name} />}
                             <AvatarFallback>{name.charAt(0)}</AvatarFallback>
                         </Avatar>
-                        <Button size="icon" variant="outline" className="absolute bottom-0 right-0 h-8 w-8 rounded-full" onClick={() => toast({title: "Coming Soon", description: "You'll be able to change your profile picture soon."})}>
+                        <Button size="icon" variant="outline" className="absolute bottom-0 right-0 h-8 w-8 rounded-full" onClick={() => toast({title: t('comingSoon'), description: t('changeProfilePictureSoon')})}>
                             <Camera className="h-4 w-4" />
                         </Button>
                     </div>
                     <div className="flex-1">
                         {isEditing ? (
                             <div className="space-y-2">
-                                <Label htmlFor="name-input" className="sr-only">Name</Label>
+                                <Label htmlFor="name-input" className="sr-only">{t('name')}</Label>
                                 <Input id="name-input" value={name} onChange={(e) => setName(e.target.value)} className="text-2xl font-bold h-11" />
                             </div>
                         ) : (
@@ -71,24 +73,24 @@ export default function FarmerProfilePage() {
                      <div>
                         {isEditing ? (
                             <div className="flex gap-2">
-                                <Button variant="secondary" onClick={handleCancel}>Cancel</Button>
+                                <Button variant="secondary" onClick={handleCancel}>{t('cancel')}</Button>
                                 <Button onClick={handleSave}>
-                                    <Save className="mr-2 h-4 w-4" /> Save
+                                    <Save className="mr-2 h-4 w-4" /> {t('save')}
                                 </Button>
                              </div>
                         ) : (
                             <Button variant="outline" onClick={() => setIsEditing(true)}>
-                                <Edit className="mr-2 h-4 w-4" /> Edit Profile
+                                <Edit className="mr-2 h-4 w-4" /> {t('editProfile')}
                             </Button>
                         )}
                     </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <InfoField icon={MapPin} label="Location" value={farmerData.location} />
-                    <InfoField icon={Wheat} label="Farm Size" value={farmerData.farmSize} />
-                    <InfoField icon={User} label="Phone Number" value={farmerData.phone} />
-                    <InfoField icon={Milestone} label="Member Since" value={farmerData.memberSince} />
+                    <InfoField icon={MapPin} label={t('location')} value={farmerData.location} />
+                    <InfoField icon={Wheat} label={t('farmSize')} value={farmerData.farmSize} />
+                    <InfoField icon={User} label={t('phoneNumber')} value={farmerData.phone} />
+                    <InfoField icon={Milestone} label={t('memberSince')} value={farmerData.memberSince} />
                 </div>
             </div>
         </DashboardCard>

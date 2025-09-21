@@ -13,11 +13,13 @@ import { ProductJourney } from '@/components/product-journey';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
+import { useI18n } from '@/contexts/i18n-context';
 
 
 function JourneyContent() {
     const searchParams = useSearchParams();
     const productId = searchParams.get('productId');
+    const { t } = useI18n();
     const { toast } = useToast();
 
     const { data: journeyData, isFetching, error, isSuccess } = useQuery({
@@ -29,9 +31,9 @@ function JourneyContent() {
 
     if (!productId) {
         return (
-            <DashboardCard title="No Product Selected" description="Please go back and select a product to trace its journey." >
+            <DashboardCard title={t('noProductSelected')} description={t('selectProductToTrace')} >
                 <Button variant="outline" asChild>
-                    <Link href="/retailer"><ArrowLeft className="mr-2 h-4 w-4" />Back to Retailer Dashboard</Link>
+                    <Link href="/retailer"><ArrowLeft className="mr-2 h-4 w-4" />{t('backToRetailerDashboard')}</Link>
                 </Button>
             </DashboardCard>
         );
@@ -39,7 +41,7 @@ function JourneyContent() {
     
     if (isFetching) {
         return (
-            <DashboardCard title="Tracing Product Journey..." description="Fetching the story of your food from farm to table.">
+            <DashboardCard title={t('tracingProductJourney')} description={t('fetchingJourneyDescription')}>
                 <div className="space-y-6">
                     <Skeleton className="h-24 w-full" />
                     <Skeleton className="h-48 w-full" />
@@ -52,20 +54,20 @@ function JourneyContent() {
     if (error) {
         toast({
             variant: "destructive",
-            title: "Error",
-            description: `Could not load product journey for ${productId}.`,
+            title: t('error'),
+            description: `${t('journeyError')} ${productId}.`,
         });
          return (
-            <DashboardCard title="Error" description={`Could not load journey for product ID: ${productId}`}>
+            <DashboardCard title={t('error')} description={`${t('journeyError')} ${productId}`}>
                  <Button variant="outline" asChild>
-                    <Link href="/retailer"><ArrowLeft className="mr-2 h-4 w-4" />Back to Retailer Dashboard</Link>
+                    <Link href="/retailer"><ArrowLeft className="mr-2 h-4 w-4" />{t('backToRetailerDashboard')}</Link>
                 </Button>
             </DashboardCard>
         );
     }
 
     if (journeyData && isSuccess) {
-        return <ProductJourney journeyData={journeyData} onReset={() => window.history.back()} resetText="Go Back" />;
+        return <ProductJourney journeyData={journeyData} onReset={() => window.history.back()} resetText={t('goBack')} />;
     }
 
     return null;
@@ -73,8 +75,9 @@ function JourneyContent() {
 
 
 export default function JourneyPage() {
+    const { t } = useI18n();
     return (
-        <Suspense fallback={<DashboardCard title="Loading Journey..."><Skeleton className="h-96 w-full" /></DashboardCard>}>
+        <Suspense fallback={<DashboardCard title={`${t('loading')} ${t('traceJourney')}...`}><Skeleton className="h-96 w-full" /></DashboardCard>}>
             <JourneyContent />
         </Suspense>
     );

@@ -14,8 +14,10 @@ import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
+import { useI18n } from '@/contexts/i18n-context'
 
 export default function FarmerPaymentsPage() {
+  const { t } = useI18n();
   const { toast } = useToast()
 
   const { data: payments, isLoading: loading, error } = useQuery({
@@ -29,35 +31,35 @@ export default function FarmerPaymentsPage() {
         console.error("Failed to fetch payments:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load payments.",
+          title: t('error'),
+          description: t('paymentsError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
 
   return (
     <DashboardCard
-      title="All Payments"
-      description="A complete history of all your received payments."
+      title={t('allPayments')}
+      description={t('completePaymentHistory')}
     >
       {loading ? (
         <Skeleton className="h-60 w-full" />
       ) : !payments || payments.length === 0 ? (
-        <div className="text-center text-muted-foreground py-12">No payments found.</div>
+        <div className="text-center text-muted-foreground py-12">{t('noPaymentsFound')}</div>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Payment ID</TableHead>
-              <TableHead>From</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead className="text-right">Date</TableHead>
+              <TableHead>{t('paymentId')}</TableHead>
+              <TableHead>{t('from')}</TableHead>
+              <TableHead>{t('amount')}</TableHead>
+              <TableHead className="text-right">{t('date')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id} onClick={() => toast({title: 'View Details (Demo)', description: 'In a real app, this would open a detailed view for the payment.'})} className="cursor-pointer">
+              <TableRow key={payment.id} onClick={() => toast({title: t('viewDetailsDemoTitle'), description: t('viewDetailsDemoDescription')})} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.id}</TableCell>
                 <TableCell>{payment.from}</TableCell>
                 <TableCell>₹{payment.amount.toLocaleString()}</TableCell>

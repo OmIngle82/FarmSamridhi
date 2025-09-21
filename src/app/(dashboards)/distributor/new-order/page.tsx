@@ -40,6 +40,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react"
+import { useI18n } from '@/contexts/i18n-context'
 
 const orderItemSchema = z.object({
   productId: z.string().min(1, "Product is required."),
@@ -55,6 +56,7 @@ type NewOrderFormData = z.infer<typeof newOrderSchema>;
 
 export default function NewOrderPage() {
   const router = useRouter()
+  const { t } = useI18n();
   const { toast } = useToast()
   const queryClient = useQueryClient()
 
@@ -90,20 +92,20 @@ export default function NewOrderPage() {
     mutationFn: (newOrder: z.infer<typeof newOrderSchema>) => addOrder({ ...newOrder, distributorId: "DIST001" }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['farmerData'] });
-      toast({ title: "Success", description: "New order has been successfully created." });
+      toast({ title: t('success'), description: t('newOrderSuccess') });
       router.push("/distributor");
     },
     onError: (error) => {
       console.error("Failed to add order:", error)
-      toast({ variant: "destructive", title: "Error", description: "Could not create the new order." });
+      toast({ variant: "destructive", title: t('error'), description: t('newOrderError') });
     },
   });
 
   useEffect(() => {
     if (error) {
-      toast({ variant: "destructive", title: "Error", description: "Could not load data for creating an order." });
+      toast({ variant: "destructive", title: t('error'), description: t('newOrderDataError') });
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
   const onSubmit = (data: NewOrderFormData) => {
     addOrderMutation.mutate(data);
@@ -111,7 +113,7 @@ export default function NewOrderPage() {
 
   if (isLoading) {
     return (
-        <DashboardCard title="Create a New Order" description="Loading farmers and products...">
+        <DashboardCard title={t('createNewOrder')} description={t('loadingFarmersAndProducts')}>
             <Skeleton className="w-full h-96" />
         </DashboardCard>
     );
@@ -120,8 +122,8 @@ export default function NewOrderPage() {
 
   return (
     <DashboardCard
-      title="Create a New Order"
-      description="Select a farmer and add products to initiate a new procurement order."
+      title={t('createNewOrder')}
+      description={t('selectFarmerAndAddProducts')}
     >
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -130,11 +132,11 @@ export default function NewOrderPage() {
             name="farmerId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Select Farmer</FormLabel>
+                <FormLabel>{t('selectFarmer')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value} required>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose a farmer to order from..." />
+                      <SelectValue placeholder={t('chooseFarmer')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -151,16 +153,16 @@ export default function NewOrderPage() {
           />
 
           <div>
-            <h3 className="text-lg font-medium mb-2">Order Items</h3>
+            <h3 className="text-lg font-medium mb-2">{t('orderItems')}</h3>
             <div className="border rounded-lg">
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead className="w-[50%]">Product</TableHead>
-                            <TableHead>Quantity (kg)</TableHead>
-                            <TableHead>Price/kg</TableHead>
-                            <TableHead>Subtotal</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
+                            <TableHead className="w-[50%]">{t('product')}</TableHead>
+                            <TableHead>{t('quantity')} (kg)</TableHead>
+                            <TableHead>{t('pricePerKg')}</TableHead>
+                            <TableHead>{t('subtotal')}</TableHead>
+                            <TableHead className="text-right">{t('actions')}</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -178,8 +180,8 @@ export default function NewOrderPage() {
                                                     <Select onValueChange={field.onChange} defaultValue={field.value} required>
                                                         <FormControl>
                                                             <SelectTrigger>
-                                                                <SelectValue placeholder="Select product" />
-                                                            </SelectTrigger>
+                                                                <SelectValue placeholder={t('selectProduct')} />
+                                                            </Trigger>
                                                         </FormControl>
                                                         <SelectContent>
                                                             {products.map(product => (
@@ -219,23 +221,23 @@ export default function NewOrderPage() {
                 </Table>
             </div>
             <Button type="button" variant="outline" size="sm" onClick={() => append({ productId: "", quantity: 1 })} className="mt-4">
-                <Plus className="mr-2 h-4 w-4" /> Add Another Product
+                <Plus className="mr-2 h-4 w-4" /> {t('addAnotherProduct')}
             </Button>
              {form.formState.errors.items && <p className="text-sm font-medium text-destructive mt-2">{form.formState.errors.items.message}</p>}
           </div>
 
           <div className="flex justify-between items-center p-4 bg-muted rounded-lg">
-                <h3 className="text-lg font-bold">Total Order Amount:</h3>
+                <h3 className="text-lg font-bold">{t('totalOrderAmount')}:</h3>
                 <p className="text-xl font-bold">₹{totalAmount.toFixed(2)}</p>
           </div>
 
           <div className="flex gap-4">
             <Button type="button" variant="outline" asChild>
-                <Link href="/distributor"><ArrowLeft className="mr-2 h-4 w-4" /> Cancel</Link>
+                <Link href="/distributor"><ArrowLeft className="mr-2 h-4 w-4" /> {t('cancel')}</Link>
             </Button>
             <Button type="submit" disabled={addOrderMutation.isPending}>
                 {addOrderMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Submit Order
+                {t('submitOrder')}
             </Button>
           </div>
         </form>
@@ -243,5 +245,3 @@ export default function NewOrderPage() {
     </DashboardCard>
   )
 }
-
-    

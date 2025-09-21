@@ -20,6 +20,7 @@ import { useEffect } from "react"
 import { getFarmerData, type Product } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from '@tanstack/react-query'
+import { useI18n } from '@/contexts/i18n-context'
 
 const transactions = [
     { id: "TRN001", date: "2024-07-21", item: "Fresh Tomatoes", amount: "₹5,000", status: "Completed" },
@@ -28,6 +29,7 @@ const transactions = [
 ]
 
 export default function RetailerDashboard() {
+  const { t } = useI18n();
   const { toast } = useToast()
 
   const { data: products, isLoading: loading, error } = useQuery({
@@ -41,11 +43,11 @@ export default function RetailerDashboard() {
         console.error("Failed to fetch products:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load products.",
+          title: t('error'),
+          description: t('productsError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
 
   const showToast = (title: string, description: string) => {
@@ -58,8 +60,8 @@ export default function RetailerDashboard() {
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
       <DashboardCard
-        title="Source Traceable Products"
-        description="Find fresh produce directly from farmers."
+        title={t('sourceTraceableProducts')}
+        description={t('findFreshProduce')}
         className="lg:col-span-3"
       >
         {loading ? (
@@ -73,7 +75,7 @@ export default function RetailerDashboard() {
                 ))}
             </div>
         ) : !products || products.length === 0 ? (
-            <div className="text-center text-muted-foreground py-12">No products available.</div>
+            <div className="text-center text-muted-foreground py-12">{t('noProductsAvailable')}</div>
         ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (
@@ -83,16 +85,16 @@ export default function RetailerDashboard() {
                     </div>
                     <div className="p-4">
                     <h3 className="font-semibold">{product.name}</h3>
-                    <p className="text-sm text-muted-foreground">from Suresh Patel</p>
+                    <p className="text-sm text-muted-foreground">{t('from')} Suresh Patel</p>
                     <div className="flex justify-between items-center mt-4">
                         <span className="font-bold text-lg">₹{product.price}/kg</span>
-                        <Button size="sm" onClick={() => showToast('Purchase (Demo)', `This would add ${product.name} to a cart.`)}>
-                        <Plus className="mr-1 h-4 w-4" /> Buy
+                        <Button size="sm" onClick={() => showToast(t('purchaseDemoTitle'), t('purchaseDemoDescription', { productName: product.name }))}>
+                        <Plus className="mr-1 h-4 w-4" /> {t('buy')}
                         </Button>
                     </div>
                     <Button variant="outline" size="sm" className="w-full mt-2" asChild>
                         <Link href={`/journey?productId=${product.id}`}>
-                            <PackageSearch className="mr-2 h-4 w-4" /> Trace Origin
+                            <PackageSearch className="mr-2 h-4 w-4" /> {t('traceOrigin')}
                         </Link>
                     </Button>
                     </div>
@@ -103,30 +105,30 @@ export default function RetailerDashboard() {
       </DashboardCard>
       
       <DashboardCard
-        title="Manage Transactions"
-        description="Your recent procurement history."
+        title={t('manageTransactions')}
+        description={t('procurementHistory')}
         className="lg:col-span-3"
       >
          <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Transaction ID</TableHead>
-              <TableHead>Date</TableHead>
+              <TableHead>{t('transactionId')}</TableHead>
+              <TableHead>{t('date')}</TableHead>
 
-              <TableHead>Item</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead className="text-right">Status</TableHead>
+              <TableHead>{t('item')}</TableHead>
+              <TableHead>{t('amount')}</TableHead>
+              <TableHead className="text-right">{t('status')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {transactions.map((transaction) => (
-              <TableRow key={transaction.id} onClick={() => showToast('View Details (Demo)', 'In a real app, this would open a detailed view for the transaction.')} className="cursor-pointer">
+              <TableRow key={transaction.id} onClick={() => showToast(t('viewDetailsDemoTitle'), t('viewDetailsDemoDescription'))} className="cursor-pointer">
                 <TableCell className="font-medium">{transaction.id}</TableCell>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.item}</TableCell>
                 <TableCell>{transaction.amount}</TableCell>
                 <TableCell className="text-right">
-                  <Badge>{transaction.status}</Badge>
+                  <Badge>{t(transaction.status.toLowerCase() as any)}</Badge>
                 </TableCell>
               </TableRow>
             ))}

@@ -22,9 +22,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 import Link from "next/link"
+import { useI18n } from '@/contexts/i18n-context'
 
 
 export default function DistributorDashboard() {
+  const { t } = useI18n();
   const { toast } = useToast()
 
   const { data, isLoading: loading, error } = useQuery({
@@ -42,17 +44,17 @@ export default function DistributorDashboard() {
         console.error("Failed to fetch distributor data:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load distributor data.",
+          title: t('error'),
+          description: t('distributorDataError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
   
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
       <DashboardCard
-        title="Verified Farmers"
-        description="Connect with trusted farmers."
+        title={t('verifiedFarmers')}
+        description={t('connectWithTrustedFarmers')}
         className="lg:col-span-1"
       >
         <div className="space-y-4">
@@ -67,7 +69,7 @@ export default function DistributorDashboard() {
                 </div>
              ))
           ) : !farmers || farmers.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">No farmers found.</div>
+            <div className="text-center text-muted-foreground py-8">{t('noFarmersFound')}</div>
           ) : (
             farmers.map((farmer) => {
               const avatar = placeholderImages.find(p => p.id === farmer.avatarId);
@@ -98,30 +100,30 @@ export default function DistributorDashboard() {
            <Button className="w-full mt-4" asChild>
                 <Link href="/distributor/new-order">
                   <PlusCircle className="mr-2 h-4 w-4" />
-                  Initiate a new order
+                  {t('initiateNewOrder')}
                 </Link>
             </Button>
         </div>
       </DashboardCard>
 
       <DashboardCard
-        title="Order Management"
-        description="Track and manage all your orders."
+        title={t('orderManagement')}
+        description={t('trackAndManageOrders')}
         className="lg:col-span-2"
       >
         {loading ? (
             <Skeleton className="h-60 w-full" />
         ) : !orders || orders.length === 0 ? (
-            <div className="text-center text-muted-foreground py-12">No orders found.</div>
+            <div className="text-center text-muted-foreground py-12">{t('noOrdersFound')}</div>
         ) : (
             <Table>
             <TableHeader>
                 <TableRow>
-                <TableHead>Order ID</TableHead>
-                <TableHead>Customer</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>{t('orderId')}</TableHead>
+                <TableHead>{t('customer')}</TableHead>
+                <TableHead>{t('amount')}</TableHead>
+                <TableHead>{t('status')}</TableHead>
+                <TableHead className="text-right">{t('actions')}</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,11 +133,13 @@ export default function DistributorDashboard() {
                     <TableCell>{order.customer}</TableCell>
                     <TableCell>₹{order.amount.toLocaleString()}</TableCell>
                     <TableCell>
-                      <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>{order.status}</Badge>
+                      <Badge variant={order.status === "Pending" ? "destructive" : order.status === "Shipped" ? "secondary" : "default"}>
+                        {t(order.status.toLowerCase() as any) || order.status}
+                      </Badge>
                     </TableCell>
                      <TableCell className="text-right">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/distributor/negotiate?orderId=${order.id}`}>Negotiate</Link>
+                          <Link href={`/distributor/negotiate?orderId=${order.id}`}>{t('negotiate')}</Link>
                         </Button>
                     </TableCell>
                 </TableRow>
@@ -146,8 +150,8 @@ export default function DistributorDashboard() {
       </DashboardCard>
 
       <DashboardCard
-        title="Inventory Tracking"
-        description="Monitor your current stock levels."
+        title={t('inventoryTracking')}
+        description={t('monitorStockLevels')}
         className="lg:col-span-3"
       >
         {loading ? (
@@ -163,14 +167,14 @@ export default function DistributorDashboard() {
                 ))}
             </div>
         ) : !inventory || inventory.length === 0 ? (
-            <div className="text-center text-muted-foreground py-12">No inventory data found.</div>
+            <div className="text-center text-muted-foreground py-12">{t('noInventoryData')}</div>
         ) : (
             <div className="space-y-6">
             {inventory.map((item) => (
                 <div key={item.item}>
                 <div className="flex justify-between mb-1">
                     <span className="font-medium">{item.item}</span>
-                    <span className={`text-sm ${item.level < 50 ? 'text-destructive' : 'text-muted-foreground'}`}>{item.status}</span>
+                    <span className={`text-sm ${item.level < 50 ? 'text-destructive' : 'text-muted-foreground'}`}>{t(item.status.replace(/\s+/g, '').toLowerCase() as any) || item.status}</span>
                 </div>
                 <Progress value={item.level} aria-label={`${item.item} stock level`} />
                 </div>
@@ -181,5 +185,3 @@ export default function DistributorDashboard() {
     </div>
   )
 }
-
-    

@@ -4,14 +4,16 @@
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import { type VoiceCommandOutput } from "@/ai/flows/voice-command-flow";
+import { useI18n } from "@/contexts/i18n-context";
 
 export function useCommandHandler(onCommandHandled?: () => void) {
     const router = useRouter();
     const { toast } = useToast();
+    const { t } = useI18n();
 
     const handleCommand = (command: VoiceCommandOutput) => {
         toast({
-            title: "Command Processed",
+            title: t('commandProcessed'),
             description: command.feedback,
         });
 

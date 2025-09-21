@@ -35,60 +35,62 @@ import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
-
-const chartConfig = {
-  price: {
-    label: "Current MSP (₹/quintal)",
-    color: "hsl(var(--chart-1))",
-  },
-  target: {
-    label: "Target Price (₹/quintal)",
-    color: "hsl(var(--chart-2))",
-  },
-} satisfies ChartConfig
+import { useI18n } from '@/contexts/i18n-context'
 
 export default function FarmerDashboard() {
+  const { t } = useI18n();
   const { toast } = useToast()
 
   const { data: farmerData, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" })
   });
+  
+  const chartConfig = {
+    price: {
+      label: t('currentMSP'),
+      color: "hsl(var(--chart-1))",
+    },
+    target: {
+      label: t('targetPrice'),
+      color: "hsl(var(--chart-2))",
+    },
+  } satisfies ChartConfig
 
   useEffect(() => {
     if (error) {
         console.error("Failed to fetch farmer data:", error)
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "Could not load farmer dashboard data.",
+          title: t('error'),
+          description: t('farmerDataError'),
         })
     }
-  }, [error, toast]);
+  }, [error, toast, t]);
 
 
   if (loading) {
     return (
         <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
-            <DashboardCard title="Quick Actions" className="xl:col-span-4">
+            <DashboardCard title={t('quickActions')} className="xl:col-span-4">
                  <div className="flex gap-4">
                     <Skeleton className="h-10 w-44" />
                     <Skeleton className="h-10 w-36" />
                 </div>
             </DashboardCard>
-            <DashboardCard title="Pending Orders" className="lg:col-span-2">
+            <DashboardCard title={t('pendingOrders')} className="lg:col-span-2">
                 <Skeleton className="h-40 w-full" />
             </DashboardCard>
-            <DashboardCard title="Recent Payments" className="lg:col-span-2">
+            <DashboardCard title={t('recentPayments')} className="lg:col-span-2">
                 <Skeleton className="h-40 w-full" />
             </DashboardCard>
-            <DashboardCard title="Live Market Prices (MSP)" className="xl:col-span-2">
+            <DashboardCard title={t('liveMarketPrices')} className="xl:col-span-2">
                  <Skeleton className="h-56 w-full" />
             </DashboardCard>
-             <DashboardCard title="Microcredit Options" className="xl:col-span-1">
+             <DashboardCard title={t('microcreditOptions')} className="xl:col-span-1">
                 <Skeleton className="h-32 w-full" />
             </DashboardCard>
-             <DashboardCard title="Government Schemes" className="xl:col-span-1">
+             <DashboardCard title={t('govtSchemes')} className="xl:col-span-1">
                 <Skeleton className="h-32 w-full" />
             </DashboardCard>
         </div>
@@ -96,7 +98,7 @@ export default function FarmerDashboard() {
   }
 
   if (!farmerData) {
-    return <div className="text-center">No data available for this farmer.</div>
+    return <div className="text-center">{t('noDataAvailable')}</div>
   }
 
   const { orders, payments, marketPrices, schemes } = farmerData
@@ -104,34 +106,34 @@ export default function FarmerDashboard() {
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
       <DashboardCard
-        title="Quick Actions"
+        title={t('quickActions')}
         className="xl:col-span-4"
       >
         <div className="flex gap-4">
             <Button asChild>
                 <Link href="/farmer/products">
-                    <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
+                    <PlusCircle className="mr-2 h-4 w-4" /> {t('addNewProduct')}
                 </Link>
             </Button>
             <Button variant="secondary" asChild>
-                <Link href="/farmer/profile">Manage Profile</Link>
+                <Link href="/farmer/profile">{t('manageProfile')}</Link>
             </Button>
         </div>
       </DashboardCard>
 
       <DashboardCard
-        title="Pending Orders"
-        description="Orders that require your attention."
+        title={t('pendingOrders')}
+        description={t('ordersRequiringAttention')}
         className="lg:col-span-2"
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Order ID</TableHead>
-              <TableHead>Customer</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
+              <TableHead>{t('orderId')}</TableHead>
+              <TableHead>{t('customer')}</TableHead>
+              <TableHead>{t('amount')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead className="text-right">{t('actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -141,12 +143,14 @@ export default function FarmerDashboard() {
                 <TableCell>{order.customer}</TableCell>
                 <TableCell>₹{order.amount.toLocaleString()}</TableCell>
                 <TableCell>
-                  <Badge variant={order.status === "Pending" ? "destructive" : "secondary"}>{order.status}</Badge>
+                  <Badge variant={order.status === "Pending" ? "destructive" : "secondary"}>
+                    {t(order.status.toLowerCase() as any) || order.status}
+                  </Badge>
                 </TableCell>
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
                         <Button variant="outline" size="sm" asChild>
-                          <Link href={`/farmer/negotiate?orderId=${order.id}`}><MessageSquare className="mr-2 h-4 w-4" />Negotiate</Link>
+                          <Link href={`/farmer/negotiate?orderId=${order.id}`}><MessageSquare className="mr-2 h-4 w-4" />{t('negotiate')}</Link>
                         </Button>
                         <a href={`tel:${order.phone}`}>
                           <Button variant="outline" size="icon" className="h-9 w-9"><Phone className="h-4 w-4"/></Button>
@@ -160,21 +164,21 @@ export default function FarmerDashboard() {
       </DashboardCard>
       
       <DashboardCard
-        title="Recent Payments"
-        description="Latest transactions to your account."
+        title={t('recentPayments')}
+        description={t('latestTransactions')}
         className="lg:col-span-2"
       >
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>From</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead className="text-right">Date</TableHead>
+              <TableHead>{t('from')}</TableHead>
+              <TableHead>{t('amount')}</TableHead>
+              <TableHead className="text-right">{t('date')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id} onClick={() => toast({title: 'View Details (Demo)', description:'In a real app, this would open a detailed view for the payment.'})} className="cursor-pointer">
+              <TableRow key={payment.id} onClick={() => toast({title: t('viewDetailsDemoTitle'), description: t('viewDetailsDemoDescription')})} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.from}</TableCell>
                 <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
                 <TableCell className="text-right">{payment.date}</TableCell>
@@ -185,8 +189,8 @@ export default function FarmerDashboard() {
       </DashboardCard>
 
       <DashboardCard
-        title="Live Market Prices (MSP)"
-        description="Current Minimum Support Prices for key crops."
+        title={t('liveMarketPrices')}
+        description={t('currentMSPsForCropsShort')}
         className="xl:col-span-2"
       >
         <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
@@ -201,26 +205,26 @@ export default function FarmerDashboard() {
       </DashboardCard>
 
       <DashboardCard
-        title="Microcredit Options"
-        description="Explore available financing options."
+        title={t('microcreditOptions')}
+        description={t('exploreFinancingOptions')}
         className="xl:col-span-1"
        >
         <div className="flex flex-col h-full justify-between">
             <div>
-                <h3 className="font-semibold text-lg">Agri-Loan Express</h3>
-                <p className="text-muted-foreground text-sm mt-1">Get quick loans up to ₹50,000 with minimal paperwork. Competitive interest rates.</p>
+                <h3 className="font-semibold text-lg">{t('agriLoanExpress')}</h3>
+                <p className="text-muted-foreground text-sm mt-1">{t('agriLoanDescription')}</p>
             </div>
             <Button className="mt-4" asChild>
                 <Link href="/farmer/finances">
-                 <DollarSign className="mr-2 h-4 w-4" /> Apply Now
+                 <DollarSign className="mr-2 h-4 w-4" /> {t('applyNow')}
                 </Link>
             </Button>
         </div>
       </DashboardCard>
 
       <DashboardCard
-        title="Government Schemes"
-        description="Beneficial programs for farmers."
+        title={t('govtSchemes')}
+        description={t('beneficialPrograms')}
         className="xl:col-span-1"
       >
         <Accordion type="single" collapsible className="w-full">
@@ -234,7 +238,7 @@ export default function FarmerDashboard() {
             ))}
         </Accordion>
          <Button variant="link" className="px-0 h-auto mt-2" asChild>
-            <Link href="/farmer/schemes">View all schemes</Link>
+            <Link href="/farmer/schemes">{t('viewAllSchemes')}</Link>
         </Button>
       </DashboardCard>
     </div>

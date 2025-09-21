@@ -17,6 +17,7 @@ import { handleVoiceCommand } from "@/ai/flows/voice-command-flow"
 import { getAudioVisualization } from "@/ai/flows/get-audio-visualization-flow"
 import { AudioVisualizer } from "./audio-visualizer"
 import { useCommandHandler } from "@/hooks/use-command-handler"
+import { useI18n } from "@/contexts/i18n-context"
 
 type VoiceCommandDialogProps = {
   open: boolean
@@ -27,6 +28,7 @@ export function VoiceCommandDialog({
   open,
   onOpenChange,
 }: VoiceCommandDialogProps) {
+  const { t } = useI18n();
   const { toast } = useToast()
   const { handleCommand } = useCommandHandler(() => onOpenChange(false));
 
@@ -70,8 +72,8 @@ export function VoiceCommandDialog({
             console.error("Error processing voice command:", error)
             toast({
               variant: "destructive",
-              title: "Error",
-              description: "Could not process your voice command. Please try again.",
+              title: t('error'),
+              description: t('voiceCommandError'),
             })
           } finally {
             setStatus("idle")
@@ -110,9 +112,8 @@ export function VoiceCommandDialog({
       console.error("Error accessing microphone:", err)
       toast({
         variant: "destructive",
-        title: "Microphone Access Denied",
-        description:
-          "Please enable microphone permissions in your browser settings.",
+        title: t('micAccessDenied'),
+        description: t('enableMicPermissions'),
       })
       setStatus("idle")
       onOpenChange(false)
@@ -154,9 +155,9 @@ export function VoiceCommandDialog({
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Voice Command</DialogTitle>
+          <DialogTitle>{t('voiceCommand')}</DialogTitle>
           <DialogDescription>
-            Click the button and speak your command. For example, "Show me my pending orders".
+            {t('voiceCommandDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -164,13 +165,13 @@ export function VoiceCommandDialog({
           {status === "listening" && (
              <div className="flex flex-col items-center gap-4 text-primary w-full px-4">
               <AudioVisualizer waveform={visualizationData} className="w-full h-16"/>
-              <p>Listening...</p>
+              <p>{t('listening')}...</p>
             </div>
           )}
           {status === "processing" && (
             <div className="flex flex-col items-center gap-4">
               <Loader2 className="h-16 w-16 animate-spin text-primary" />
-              <p>Processing...</p>
+              <p>{t('processing')}...</p>
             </div>
           )}
           {(status === "idle" || status === "requesting") && (
@@ -188,11 +189,11 @@ export function VoiceCommandDialog({
         <DialogFooter>
           {status === "listening" ? (
              <Button onClick={stopRecording} className="w-full">
-                Stop Recording
+                {t('stopRecording')}
              </Button>
           ) : (
              <Button variant="outline" onClick={handleClose} className="w-full">
-                <X className="mr-2 h-4 w-4" /> Cancel
+                <X className="mr-2 h-4 w-4" /> {t('cancel')}
              </Button>
           )}
         </DialogFooter>
