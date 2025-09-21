@@ -35,11 +35,6 @@ import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
 import Link from "next/link"
 
-const farmers = [
-  { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
-  { name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2", phone: "9876543211" },
-  { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
-]
 
 export default function DistributorDashboard() {
   const { toast } = useToast()
@@ -47,11 +42,12 @@ export default function DistributorDashboard() {
   const { data, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }),
-      select: (data) => ({ orders: data.orders, inventory: data.inventory })
+      select: (data) => ({ orders: data.orders, inventory: data.inventory, farmers: data.farmers })
   });
 
   const orders = data?.orders;
   const inventory = data?.inventory;
+  const farmers = data?.farmers;
 
   useEffect(() => {
     if (error) {
@@ -72,31 +68,45 @@ export default function DistributorDashboard() {
         className="lg:col-span-1"
       >
         <div className="space-y-4">
-          {farmers.map((farmer) => {
-            const avatar = placeholderImages.find(p => p.id === farmer.avatarId);
-            return (
-              <div key={farmer.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Avatar>
-                    <AvatarImage src={avatar?.imageUrl} alt={farmer.name} data-ai-hint={avatar?.imageHint} />
-                    <AvatarFallback>{farmer.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="font-medium">{farmer.name}</p>
-                    <p className="text-sm text-muted-foreground">{farmer.location}</p>
+          {loading ? (
+             [...Array(3)].map((_, i) => (
+                <div key={i} className="flex items-center gap-4">
+                  <Skeleton className="h-10 w-10 rounded-full" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-24" />
+                    <Skeleton className="h-3 w-32" />
                   </div>
                 </div>
-                <div className="flex gap-2">
-                    <a href={`tel:${farmer.phone}`}>
-                      <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4" /></Button>
-                    </a>
-                    <a href={`sms:${farmer.phone}`}>
-                      <Button variant="outline" size="icon" className="h-8 w-8"><MessageCircle className="h-4 w-4" /></Button>
-                    </a>
+             ))
+          ) : !farmers || farmers.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">No farmers found.</div>
+          ) : (
+            farmers.map((farmer) => {
+              const avatar = placeholderImages.find(p => p.id === farmer.avatarId);
+              return (
+                <div key={farmer.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <Avatar>
+                      <AvatarImage src={avatar?.imageUrl} alt={farmer.name} data-ai-hint={avatar?.imageHint} />
+                      <AvatarFallback>{farmer.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="font-medium">{farmer.name}</p>
+                      <p className="text-sm text-muted-foreground">{farmer.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                      <a href={`tel:${farmer.phone}`}>
+                        <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4" /></Button>
+                      </a>
+                      <a href={`sms:${farmer.phone}`}>
+                        <Button variant="outline" size="icon" className="h-8 w-8"><MessageCircle className="h-4 w-4" /></Button>
+                      </a>
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })
+          )}
            <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button className="w-full mt-4">

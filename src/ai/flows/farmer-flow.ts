@@ -78,6 +78,14 @@ const InventoryItemSchema = z.object({
 });
 export type InventoryItem = z.infer<typeof InventoryItemSchema>;
 
+const FarmerProfileSchema = z.object({
+    name: z.string(),
+    location: z.string(),
+    avatarId: z.string(),
+    phone: z.string(),
+});
+export type FarmerProfile = z.infer<typeof FarmerProfileSchema>;
+
 const FarmerDataSchema = z.object({
   products: z.array(ProductSchema),
   orders: z.array(OrderSchema),
@@ -85,6 +93,7 @@ const FarmerDataSchema = z.object({
   marketPrices: z.array(MarketPriceSchema),
   schemes: z.array(SchemeSchema),
   inventory: z.array(InventoryItemSchema),
+  farmers: z.array(FarmerProfileSchema),
 });
 
 export type FarmerData = z.infer<typeof FarmerDataSchema>;
@@ -135,6 +144,12 @@ const mockInventory: InventoryItem[] = [
   { item: "Potatoes", level: 90, status: "In Stock" },
 ];
 
+const mockFarmers: FarmerProfile[] = [
+  { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
+  { name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2", phone: "9876543211" },
+  { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
+]
+
 
 export async function getFarmerData(
   input: z.infer<typeof FarmerDataRequestSchema>
@@ -178,6 +193,7 @@ const getFarmerDataFlow = ai.defineFlow(
       marketPrices: mockMarketPrices,
       schemes: mockSchemes,
       inventory: mockInventory,
+      farmers: mockFarmers,
     };
   }
 );
