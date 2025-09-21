@@ -5,14 +5,48 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DashboardCard } from "@/components/dashboard-card"
 import type { ProductJourneyData } from "@/ai/flows/journey-flow"
-import { Sprout, Wheat, Truck, Warehouse, Store, ArrowLeft } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 
-const iconMap = {
-    seeding: <Sprout className="h-6 w-6 text-primary" />,
-    harvest: <Wheat className="h-6 w-6 text-primary" />,
-    transit: <Truck className="h-6 w-6 text-primary" />,
-    warehouse: <Warehouse className="h-6 w-6 text-primary" />,
-    retail: <Store className="h-6 w-6 text-primary" />,
+const iconMap: { [key: string]: React.ReactNode } = {
+    seeding: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
+            <path d="M4 22h16"/>
+            <path d="M6 18h12"/>
+            <path d="M6 14h12"/>
+            <path d="M12 4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Z"/>
+            <path d="M12 14v4"/>
+        </svg>
+    ),
+    harvest: (
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
+            <path d="M8.5 21.5 18 12 16 2l-6 6-1.5-1.5L2 14l6.5 7.5Z"/>
+            <path d="m17 8 5 5"/>
+        </svg>
+    ),
+    transit: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
+            <path d="M5 18H3c-.6 0-1-.4-1-1V7c0-.6.4-1 1-1h10c.6 0 1 .4 1 1v11"/>
+            <path d="M14 9h4l4 4v4h-8v-4h-4V9Z"/>
+            <circle cx="7" cy="18" r="2"/>
+            <circle cx="17" cy="18" r="2"/>
+        </svg>
+    ),
+    warehouse: (
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
+            <path d="M22 8.35V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8.35A2 2 0 0 1 3.26 6.5l8-3.2a2 2 0 0 1 1.48 0l8 3.2A2 2 0 0 1 22 8.35Z"/>
+            <path d="M6 18h12"/>
+            <path d="M6 14h12"/>
+            <path d="M12 14v4"/>
+        </svg>
+    ),
+    retail: (
+         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-primary">
+            <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"/>
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <path d="M12 22V12"/>
+            <path d="M15 12a3 3 0 0 0-6 0"/>
+        </svg>
+    ),
 }
 
 type ProductJourneyProps = {
