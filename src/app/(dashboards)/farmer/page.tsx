@@ -1,4 +1,5 @@
 "use client"
+import Link from "next/link"
 import {
   Accordion,
   AccordionContent,
@@ -118,8 +119,10 @@ export default function FarmerDashboard() {
         className="xl:col-span-4"
       >
         <div className="flex gap-4">
-            <Button onClick={() => showToast('Add Product', 'Functionality to add a new product is coming soon!')}>
-                <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
+            <Button asChild>
+                <Link href="/farmer/products">
+                    <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
+                </Link>
             </Button>
             <Button variant="secondary" onClick={() => showToast('Manage Profile', 'Profile management page is not yet available.')}>Manage Profile</Button>
         </div>
