@@ -14,7 +14,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { Phone } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getOrders } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -23,10 +23,7 @@ export default function FarmerOrdersPage() {
 
   const { data: orders, isLoading: loading, error } = useQuery({
       queryKey: ['farmerOrders'],
-      queryFn: async () => {
-          const data = await getFarmerData({ farmerId: "FARM001" });
-          return data.orders;
-      }
+      queryFn: () => getOrders("FARM001")
   });
 
   useEffect(() => {

@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getSchemes } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -18,10 +18,7 @@ export default function FarmerSchemesPage() {
 
   const { data: schemes, isLoading: loading, error } = useQuery({
     queryKey: ['schemes'],
-    queryFn: async () => {
-      const data = await getFarmerData({ farmerId: "FARM001" });
-      return data.schemes;
-    }
+    queryFn: () => getSchemes("FARM001")
   });
 
   useEffect(() => {

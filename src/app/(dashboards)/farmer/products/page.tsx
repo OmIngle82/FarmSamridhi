@@ -58,7 +58,7 @@ function ProductsPageContent() {
 
   const { data: products = [], isLoading: loading, error } = useQuery<Product[]>({
       queryKey: ['products'],
-      queryFn: () => getProducts({ farmerId: "FARM001" })
+      queryFn: () => getProducts("FARM001")
   });
 
   useEffect(() => {

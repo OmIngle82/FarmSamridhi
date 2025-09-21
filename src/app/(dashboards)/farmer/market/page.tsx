@@ -13,7 +13,7 @@ import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/compo
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getMarketPrices } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -33,10 +33,7 @@ export default function FarmerMarketPage() {
 
   const { data: marketPrices, isLoading: loading, error } = useQuery({
     queryKey: ['marketPrices'],
-    queryFn: async () => {
-        const data = await getFarmerData({ farmerId: "FARM001" });
-        return data.marketPrices;
-    }
+    queryFn: () => getMarketPrices("FARM001")
   });
 
   useEffect(() => {

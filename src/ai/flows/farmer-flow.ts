@@ -53,17 +53,22 @@ const PaymentSchema = z.object({
   date: z.string(),
 });
 
+export type Payment = z.infer<typeof PaymentSchema>;
+
 const MarketPriceSchema = z.object({
   crop: z.string(),
   price: z.number(),
   target: z.number(),
 });
+export type MarketPrice = z.infer<typeof MarketPriceSchema>;
+
 
 const SchemeSchema = z.object({
   name: z.string(),
   description: z.string(),
   eligibility: z.string(),
 });
+export type Scheme = z.infer<typeof SchemeSchema>;
 
 const FarmerDataSchema = z.object({
   products: z.array(ProductSchema),
@@ -85,19 +90,19 @@ let mockOrders: Order[] = [
     { id: "ORD002", customer: "Local Mandi", amount: 8200, status: "Shipped", phone: "9123456781" },
     { id: "ORD003", customer: "Reliance Fresh", amount: 25000, status: "Pending", phone: "9123456782" },
 ];
-let mockPayments = [
+let mockPayments: Payment[] = [
     {id: "PAY001", from: "BigBasket", amount: 12500, date: "2024-07-20"},
     {id: "PAY002", from: "Govt. Subsidy", amount: 5000, date: "2024-07-18"},
     {id: "PAY003", from: "Local Mandi", amount: 8200, date: "2024-07-15"},
 ];
-const mockMarketPrices = [
+const mockMarketPrices: MarketPrice[] = [
     { crop: "Wheat", price: 2150, target: 2200 },
     { crop: "Tomato", price: 1800, target: 2000 },
     { crop: "Potato", price: 2300, target: 2250 },
     { crop: "Onion", price: 2500, target: 2600 },
     { crop: "Paddy", price: 2040, target: 2100 },
 ];
-const mockSchemes = [
+const mockSchemes: Scheme[] = [
     {
         name: "PM-KISAN Scheme",
         description: "Income support of ₹6,000/year for all landholding farmer families.",
@@ -122,11 +127,40 @@ export async function getFarmerData(
 }
 
 export async function getProducts(
-  input: z.infer<typeof FarmerDataRequestSchema>
+  farmerId: string
 ): Promise<Product[]> {
-    console.log(`Fetching products for farmer: ${input.farmerId}`);
+    console.log(`Fetching products for farmer: ${farmerId}`);
     return Promise.resolve(mockProducts);
 }
+
+export async function getOrders(
+  farmerId: string
+): Promise<Order[]> {
+    console.log(`Fetching orders for farmer: ${farmerId}`);
+    return Promise.resolve(mockOrders);
+}
+
+export async function getPayments(
+  farmerId: string
+): Promise<Payment[]> {
+    console.log(`Fetching payments for farmer: ${farmerId}`);
+    return Promise.resolve(mockPayments);
+}
+
+export async function getMarketPrices(
+  farmerId: string
+): Promise<MarketPrice[]> {
+    console.log(`Fetching market prices for farmer: ${farmerId}`);
+    return Promise.resolve(mockMarketPrices);
+}
+
+export async function getSchemes(
+  farmerId: string
+): Promise<Scheme[]> {
+    console.log(`Fetching schemes for farmer: ${farmerId}`);
+    return Promise.resolve(mockSchemes);
+}
+
 
 export async function getOrder(
   orderId: string

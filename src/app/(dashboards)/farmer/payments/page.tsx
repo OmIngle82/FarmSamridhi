@@ -10,7 +10,7 @@ import {
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getPayments } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -19,10 +19,7 @@ export default function FarmerPaymentsPage() {
 
   const { data: payments, isLoading: loading, error } = useQuery({
     queryKey: ['farmerPayments'],
-    queryFn: async () => {
-      const data = await getFarmerData({ farmerId: "FARM001" });
-      return data.payments;
-    }
+    queryFn: () => getPayments("FARM001")
   });
 
   useEffect(() => {

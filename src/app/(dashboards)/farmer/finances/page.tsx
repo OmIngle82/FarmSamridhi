@@ -12,7 +12,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, Download, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getPayments } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -21,10 +21,7 @@ export default function FarmerFinancesPage() {
 
   const { data: payments, isLoading: loading, error } = useQuery({
     queryKey: ['payments'],
-    queryFn: async () => {
-      const data = await getFarmerData({ farmerId: "FARM001" });
-      return data.payments;
-    }
+    queryFn: () => getPayments("FARM001")
   });
 
   useEffect(() => {

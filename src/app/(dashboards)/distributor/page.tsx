@@ -16,7 +16,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData, type FarmerData } from "@/ai/flows/farmer-flow"
+import { getOrders } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
@@ -38,10 +38,7 @@ export default function DistributorDashboard() {
 
   const { data: orders, isLoading: loading, error } = useQuery({
       queryKey: ['orders'],
-      queryFn: async () => {
-          const data = await getFarmerData({ farmerId: "FARM001" });
-          return data.orders;
-      }
+      queryFn: () => getOrders("FARM001")
   });
 
   useEffect(() => {
