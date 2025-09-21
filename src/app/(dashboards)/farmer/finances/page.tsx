@@ -1,6 +1,9 @@
 
 "use client"
 import { useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
 import {
   Table,
   TableBody,
@@ -31,13 +34,21 @@ import {
   SheetFooter,
   SheetClose,
 } from "@/components/ui/sheet"
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form"
 
 import { DashboardCard } from "@/components/dashboard-card"
-import { DollarSign, Download, PlusCircle } from "lucide-react"
+import { DollarSign, Download, PlusCircle, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getFarmerData, addExpense, applyForLoan } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Select,
   SelectContent,
@@ -53,12 +64,28 @@ import { cn } from "@/lib/utils"
 import { useI18n } from '@/contexts/i18n-context'
 
 
+const loanSchema = z.object({
+    amount: z.coerce.number().min(1000, "Loan amount must be at least ₹1,000"),
+    purpose: z.string().min(10, "Please provide a more detailed purpose."),
+});
+
+type LoanFormData = z.infer<typeof loanSchema>;
+
+const expenseSchema = z.object({
+    category: z.string().min(1, "Category is required."),
+    amount: z.coerce.number().min(1, "Amount must be greater than 0."),
+    date: z.date({ required_error: "Please select a date."}),
+});
+
+type ExpenseFormData = z.infer<typeof expenseSchema>;
+
+
 export default function FarmerFinancesPage() {
   const { t } = useI18n();
   const { toast } = useToast()
+  const queryClient = useQueryClient();
   const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false)
   const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false)
-  const [expenseDate, setExpenseDate] = useState<Date>()
 
   const { data: farmerData, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
@@ -66,6 +93,48 @@ export default function FarmerFinancesPage() {
   });
   
   const payments = farmerData?.payments;
+
+  const loanForm = useForm<LoanFormData>({
+    resolver: zodResolver(loanSchema),
+    defaultValues: { amount: 10000, purpose: "" },
+  });
+
+  const expenseForm = useForm<ExpenseFormData>({
+      resolver: zodResolver(expenseSchema),
+      defaultValues: { category: "", amount: 0, date: new Date() },
+  });
+
+  const applyLoanMutation = useMutation({
+    mutationFn: (data: LoanFormData) => applyForLoan({ ...data, farmerId: "FARM001" }),
+    onSuccess: () => {
+        setIsLoanDialogOpen(false);
+        loanForm.reset();
+        toast({
+            title: t('loanAppSubmitted'),
+            description: t('loanAppUnderReview')
+        });
+    },
+    onError: (err) => {
+        toast({ variant: "destructive", title: t('error'), description: "Could not submit loan application."});
+        console.error(err);
+    }
+  });
+
+  const addExpenseMutation = useMutation({
+    mutationFn: (data: Omit<ExpenseFormData, 'date'> & { date: string }) => addExpense({ ...data, farmerId: "FARM001" }),
+    onSuccess: () => {
+        setIsExpenseSheetOpen(false);
+        expenseForm.reset();
+        toast({
+            title: t('expenseAdded'),
+            description: t('expenseRecordedSuccess')
+        });
+    },
+    onError: (err) => {
+        toast({ variant: "destructive", title: t('error'), description: "Could not record expense."});
+        console.error(err);
+    }
+  });
 
   useEffect(() => {
     if (error) {
@@ -81,22 +150,12 @@ export default function FarmerFinancesPage() {
 
   const totalIncome = payments?.reduce((acc, p) => acc + p.amount, 0) || 0
 
-  const handleLoanSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoanDialogOpen(false);
-    toast({
-        title: t('loanAppSubmitted'),
-        description: t('loanAppUnderReview')
-    });
+  const handleLoanSubmit = (data: LoanFormData) => {
+    applyLoanMutation.mutate(data);
   }
   
-  const handleExpenseSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsExpenseSheetOpen(false);
-    toast({
-        title: t('expenseAdded'),
-        description: t('expenseRecordedSuccess')
-    });
+  const handleExpenseSubmit = (data: ExpenseFormData) => {
+    addExpenseMutation.mutate({ ...data, date: format(data.date, "yyyy-MM-dd")});
   }
 
   const handleDownloadReport = () => {
@@ -210,28 +269,45 @@ export default function FarmerFinancesPage() {
                     {t('fillLoanDetails')}
                 </DialogDescription>
             </DialogHeader>
-            <form onSubmit={handleLoanSubmit}>
-                <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="loan-amount" className="text-right">
-                            {t('amount')} (₹)
-                        </Label>
-                        <Input id="loan-amount" type="number" defaultValue="10000" className="col-span-3" required/>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="loan-purpose" className="text-right">
-                            {t('purpose')}
-                        </Label>
-                        <Textarea id="loan-purpose" placeholder={t('loanPurposePlaceholder')} className="col-span-3" required/>
-                    </div>
-                </div>
+            <Form {...loanForm}>
+            <form onSubmit={loanForm.handleSubmit(handleLoanSubmit)} className="space-y-4">
+                 <FormField
+                    control={loanForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{t('amount')} (₹)</FormLabel>
+                        <FormControl>
+                            <Input type="number" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={loanForm.control}
+                    name="purpose"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>{t('purpose')}</FormLabel>
+                        <FormControl>
+                            <Textarea placeholder={t('loanPurposePlaceholder')} {...field}/>
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button type="button" variant="secondary">{t('cancel')}</Button>
                     </DialogClose>
-                    <Button type="submit">{t('submitApplication')}</Button>
+                    <Button type="submit" disabled={applyLoanMutation.isPending}>
+                        {applyLoanMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {t('submitApplication')}
+                    </Button>
                 </DialogFooter>
             </form>
+            </Form>
         </DialogContent>
     </Dialog>
     
@@ -243,14 +319,20 @@ export default function FarmerFinancesPage() {
                     {t('keepTrackOfExpenses')}
                 </SheetDescription>
             </SheetHeader>
-            <form onSubmit={handleExpenseSubmit}>
-                <div className="grid gap-4 py-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="expense-category">{t('category')}</Label>
-                        <Select required>
-                            <SelectTrigger id="expense-category">
+            <Form {...expenseForm}>
+            <form onSubmit={expenseForm.handleSubmit(handleExpenseSubmit)} className="space-y-4 py-4">
+                 <FormField
+                    control={expenseForm.control}
+                    name="category"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('category')}</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                            <SelectTrigger>
                                 <SelectValue placeholder={t('selectCategory')} />
                             </SelectTrigger>
+                            </FormControl>
                             <SelectContent>
                                 <SelectItem value="seeds">{t('seeds')}</SelectItem>
                                 <SelectItem value="fertilizer">{t('fertilizer')}</SelectItem>
@@ -260,44 +342,75 @@ export default function FarmerFinancesPage() {
                                 <SelectItem value="other">{t('other')}</SelectItem>
                             </SelectContent>
                         </Select>
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="expense-amount">{t('amount')} (₹)</Label>
-                        <Input id="expense-amount" type="number" placeholder="5000" required />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="expense-date">{t('dateOfExpense')}</Label>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                 <FormField
+                    control={expenseForm.control}
+                    name="amount"
+                    render={({ field }) => (
+                        <FormItem>
+                        <FormLabel>{t('amount')} (₹)</FormLabel>
+                        <FormControl>
+                            <Input type="number" placeholder="5000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                 <FormField
+                    control={expenseForm.control}
+                    name="date"
+                    render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                        <FormLabel>{t('dateOfExpense')}</FormLabel>
                         <Popover>
                             <PopoverTrigger asChild>
+                            <FormControl>
                                 <Button
                                 variant={"outline"}
                                 className={cn(
-                                    "w-full justify-start text-left font-normal",
-                                    !expenseDate && "text-muted-foreground"
+                                    "w-full pl-3 text-left font-normal",
+                                    !field.value && "text-muted-foreground"
                                 )}
                                 >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {expenseDate ? format(expenseDate, "PPP") : <span>{t('pickADate')}</span>}
+                                {field.value ? (
+                                    format(field.value, "PPP")
+                                ) : (
+                                    <span>{t('pickADate')}</span>
+                                )}
+                                <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                                 </Button>
+                            </FormControl>
                             </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0">
-                                <Calendar
+                            <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
                                 mode="single"
-                                selected={expenseDate}
-                                onSelect={setExpenseDate}
+                                selected={field.value}
+                                onSelect={field.onChange}
+                                disabled={(date) =>
+                                date > new Date() || date < new Date("1900-01-01")
+                                }
                                 initialFocus
-                                />
+                            />
                             </PopoverContent>
                         </Popover>
-                    </div>
-                </div>
-                <SheetFooter>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                <SheetFooter className="pt-4">
                     <SheetClose asChild>
                         <Button type="button" variant="secondary">{t('cancel')}</Button>
                     </SheetClose>
-                    <Button type="submit">{t('saveExpense')}</Button>
+                    <Button type="submit" disabled={addExpenseMutation.isPending}>
+                         {addExpenseMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {t('saveExpense')}
+                    </Button>
                 </SheetFooter>
             </form>
+            </Form>
         </SheetContent>
     </Sheet>
     </>

@@ -99,6 +99,38 @@ const FarmerProfileSchema = z.object({
 });
 export type FarmerProfile = z.infer<typeof FarmerProfileSchema>;
 
+const ExpenseSchema = z.object({
+    id: z.string(),
+    category: z.string(),
+    amount: z.number(),
+    date: z.string(),
+    farmerId: z.string(),
+});
+export type Expense = z.infer<typeof ExpenseSchema>;
+
+const AddExpenseRequestSchema = z.object({
+    farmerId: z.string(),
+    category: z.string(),
+    amount: z.number(),
+    date: z.string(),
+});
+
+const LoanApplicationSchema = z.object({
+    id: z.string(),
+    amount: z.number(),
+    purpose: z.string(),
+    farmerId: z.string(),
+    status: z.enum(['Pending', 'Approved', 'Rejected']),
+});
+export type LoanApplication = z.infer<typeof LoanApplicationSchema>;
+
+const ApplyForLoanRequestSchema = z.object({
+    farmerId: z.string(),
+    amount: z.number(),
+    purpose: z.string(),
+});
+
+
 const FarmerDataSchema = z.object({
   products: z.array(ProductSchema),
   orders: z.array(OrderSchema),
@@ -163,6 +195,9 @@ const mockFarmers: FarmerProfile[] = [
   { id: "FARM003", name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
 ]
 
+let mockExpenses: Expense[] = [];
+let mockLoanApplications: LoanApplication[] = [];
+
 
 export async function getFarmerData(
   input: z.infer<typeof FarmerDataRequestSchema>
@@ -194,6 +229,19 @@ export async function deleteProduct(
 ): Promise<{ success: boolean }> {
     return deleteProductFlow(input);
 }
+
+export async function addExpense(
+  input: z.infer<typeof AddExpenseRequestSchema>
+): Promise<Expense> {
+    return addExpenseFlow(input);
+}
+
+export async function applyForLoan(
+  input: z.infer<typeof ApplyForLoanRequestSchema>
+): Promise<LoanApplication> {
+    return applyForLoanFlow(input);
+}
+
 
 const getFarmerDataFlow = ai.defineFlow(
   {
@@ -301,6 +349,42 @@ const deleteProductFlow = ai.defineFlow(
   }
 );
 
+const addExpenseFlow = ai.defineFlow(
+    {
+        name: 'addExpenseFlow',
+        inputSchema: AddExpenseRequestSchema,
+        outputSchema: ExpenseSchema,
+    },
+    async (expenseData) => {
+        console.log(`Adding expense for farmer: ${expenseData.farmerId}`);
+        const newExpense: Expense = {
+            id: `EXP${String(mockExpenses.length + 1).padStart(3, '0')}`,
+            ...expenseData,
+        };
+        mockExpenses.push(newExpense);
+        console.log("Current expenses:", mockExpenses);
+        return newExpense;
+    }
+);
+
+const applyForLoanFlow = ai.defineFlow(
+    {
+        name: 'applyForLoanFlow',
+        inputSchema: ApplyForLoanRequestSchema,
+        outputSchema: LoanApplicationSchema,
+    },
+    async (loanData) => {
+        console.log(`Processing loan application for farmer: ${loanData.farmerId}`);
+        const newLoanApplication: LoanApplication = {
+            id: `LOAN${String(mockLoanApplications.length + 1).padStart(3, '0')}`,
+            status: 'Pending',
+            ...loanData,
+        };
+        mockLoanApplications.push(newLoanApplication);
+        console.log("Current loan applications:", mockLoanApplications);
+        return newLoanApplication;
+    }
+);
     
 
     
