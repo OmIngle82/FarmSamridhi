@@ -71,12 +71,20 @@ const SchemeSchema = z.object({
 });
 export type Scheme = z.infer<typeof SchemeSchema>;
 
+const InventoryItemSchema = z.object({
+    item: z.string(),
+    level: z.number(),
+    status: z.string(),
+});
+export type InventoryItem = z.infer<typeof InventoryItemSchema>;
+
 const FarmerDataSchema = z.object({
   products: z.array(ProductSchema),
   orders: z.array(OrderSchema),
   payments: z.array(PaymentSchema),
   marketPrices: z.array(MarketPriceSchema),
   schemes: z.array(SchemeSchema),
+  inventory: z.array(InventoryItemSchema),
 });
 
 export type FarmerData = z.infer<typeof FarmerDataSchema>;
@@ -121,6 +129,13 @@ const mockSchemes: Scheme[] = [
     }
 ];
 
+const mockInventory: InventoryItem[] = [
+  { item: "Tomatoes", level: 75, status: "In Stock" },
+  { item: "Wheat", level: 40, status: "Low Stock" },
+  { item: "Potatoes", level: 90, status: "In Stock" },
+];
+
+
 export async function getFarmerData(
   input: z.infer<typeof FarmerDataRequestSchema>
 ): Promise<FarmerData> {
@@ -162,6 +177,7 @@ const getFarmerDataFlow = ai.defineFlow(
       payments: mockPayments,
       marketPrices: mockMarketPrices,
       schemes: mockSchemes,
+      inventory: mockInventory,
     };
   }
 );

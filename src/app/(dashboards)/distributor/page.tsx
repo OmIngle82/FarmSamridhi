@@ -41,39 +41,28 @@ const farmers = [
   { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
 ]
 
-const inventory = [
-  { item: "Tomatoes", level: 75, status: "In Stock" },
-  { item: "Wheat", level: 40, status: "Low Stock" },
-  { item: "Potatoes", level: 90, status: "In Stock" },
-]
-
 export default function DistributorDashboard() {
   const { toast } = useToast()
 
-  const { data: orders, isLoading: loading, error } = useQuery({
+  const { data, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }),
-      select: (data) => data.orders
+      select: (data) => ({ orders: data.orders, inventory: data.inventory })
   });
+
+  const orders = data?.orders;
+  const inventory = data?.inventory;
 
   useEffect(() => {
     if (error) {
-        console.error("Failed to fetch orders:", error)
+        console.error("Failed to fetch distributor data:", error)
         toast({
           variant: "destructive",
           title: "Error",
-          description: "Could not load orders.",
+          description: "Could not load distributor data.",
         })
     }
   }, [error, toast]);
-
-
-  const showToast = (title: string, description: string) => {
-    toast({
-        title,
-        description,
-    });
-  };
   
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
@@ -176,17 +165,33 @@ export default function DistributorDashboard() {
         description="Monitor your current stock levels."
         className="lg:col-span-3"
       >
-        <div className="space-y-6">
-          {inventory.map((item) => (
-            <div key={item.item}>
-              <div className="flex justify-between mb-1">
-                <span className="font-medium">{item.item}</span>
-                <span className={`text-sm ${item.level < 50 ? 'text-destructive' : 'text-muted-foreground'}`}>{item.status}</span>
-              </div>
-              <Progress value={item.level} aria-label={`${item.item} stock level`} />
+        {loading ? (
+             <div className="space-y-6">
+                {[...Array(3)].map((_, i) => (
+                    <div key={i}>
+                        <div className="flex justify-between mb-1">
+                            <Skeleton className="h-5 w-24" />
+                            <Skeleton className="h-5 w-20" />
+                        </div>
+                        <Skeleton className="h-4 w-full" />
+                    </div>
+                ))}
             </div>
-          ))}
-        </div>
+        ) : !inventory || inventory.length === 0 ? (
+            <div className="text-center text-muted-foreground py-12">No inventory data found.</div>
+        ) : (
+            <div className="space-y-6">
+            {inventory.map((item) => (
+                <div key={item.item}>
+                <div className="flex justify-between mb-1">
+                    <span className="font-medium">{item.item}</span>
+                    <span className={`text-sm ${item.level < 50 ? 'text-destructive' : 'text-muted-foreground'}`}>{item.status}</span>
+                </div>
+                <Progress value={item.level} aria-label={`${item.item} stock level`} />
+                </div>
+            ))}
+            </div>
+        )}
       </DashboardCard>
     </div>
   )
