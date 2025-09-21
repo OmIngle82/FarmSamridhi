@@ -13,6 +13,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+
 import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
@@ -96,10 +108,25 @@ export default function DistributorDashboard() {
               </div>
             )
           })}
-           <Button className="w-full mt-4" onClick={() => showToast('New Order', 'Feature to initiate new order is coming soon!')}>
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Initiate a new order
-          </Button>
+           <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button className="w-full mt-4">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Initiate a new order
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Feature Coming Soon!</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    The ability to initiate a new order directly from the dashboard is currently under development. Please check back later.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogAction>OK</AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
         </div>
       </DashboardCard>
 
