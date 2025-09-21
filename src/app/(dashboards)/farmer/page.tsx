@@ -27,16 +27,12 @@ import type { ChartConfig } from "@/components/ui/chart"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 
 import { DashboardCard } from "@/components/dashboard-card"
-import { DollarSign, MessageCircle, Phone, PlusCircle } from "lucide-react"
+import { DollarSign, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-
-const chartData = [
-  { crop: "Wheat", price: 2150, target: 2200 },
-  { crop: "Tomato", price: 1800, target: 2000 },
-  { crop: "Potato", price: 2300, target: 2250 },
-  { crop: "Onion", price: 2500, target: 2600 },
-  { crop: "Paddy", price: 2040, target: 2100 },
-]
+import { useEffect, useState } from "react"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
+import type { FarmerData } from "@/ai/flows/farmer-flow"
+import { Skeleton } from "@/components/ui/skeleton"
 
 const chartConfig = {
   price: {
@@ -49,45 +45,71 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-const orders = [
-  { id: "ORD001", customer: "BigBasket", amount: "₹12,500", status: "Pending", phone: "9123456780" },
-  { id: "ORD002", customer: "Local Mandi", amount: "₹8,200", status: "Shipped", phone: "9123456781" },
-  { id: "ORD003", customer: "Reliance Fresh", amount: "₹25,000", status: "Pending", phone: "9123456782" },
-]
-
-const payments = [
-    {id: "PAY001", from: "BigBasket", amount: "₹12,500", date: "2024-07-20"},
-    {id: "PAY002", from: "Govt. Subsidy", amount: "₹5,000", date: "2024-07-18"},
-    {id: "PAY003", from: "Local Mandi", amount: "₹8,200", date: "2024-07-15"},
-]
-
-const schemes = [
-    {
-        name: "PM-KISAN Scheme",
-        description: "Income support of ₹6,000/year for all landholding farmer families.",
-        eligibility: "All landholding farmer families."
-    },
-    {
-        name: "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
-        description: "Insurance coverage and financial support to farmers in the event of failure of any of the notified crops as a result of natural calamities, pests & diseases.",
-        eligibility: "All farmers including sharecroppers and tenant farmers growing notified crops in the notified areas are eligible for coverage."
-    },
-    {
-        name: "Kisan Credit Card (KCC) Scheme",
-        description: "Provides farmers with timely access to credit for their cultivation needs as well as for non-farm activities.",
-        eligibility: "All farmers - individuals/joint borrowers who are owner cultivators."
-    }
-]
-
 export default function FarmerDashboard() {
   const { toast } = useToast()
-  
+  const [farmerData, setFarmerData] = useState<FarmerData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true)
+        const data = await getFarmerData({ farmerId: "FARM001" })
+        setFarmerData(data)
+      } catch (error) {
+        console.error("Failed to fetch farmer data:", error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not load farmer dashboard data.",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [toast])
+
   const showToast = (title: string, description: string) => {
     toast({
         title,
         description,
     });
   };
+
+  if (loading) {
+    return (
+        <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
+            <DashboardCard title="Quick Actions" className="xl:col-span-4">
+                 <div className="flex gap-4">
+                    <Skeleton className="h-10 w-44" />
+                    <Skeleton className="h-10 w-36" />
+                </div>
+            </DashboardCard>
+            <DashboardCard title="Pending Orders" className="lg:col-span-2">
+                <Skeleton className="h-40 w-full" />
+            </DashboardCard>
+            <DashboardCard title="Recent Payments" className="lg:col-span-2">
+                <Skeleton className="h-40 w-full" />
+            </DashboardCard>
+            <DashboardCard title="Live Market Prices (MSP)" className="xl:col-span-2">
+                 <Skeleton className="h-56 w-full" />
+            </DashboardCard>
+            <DashboardCard title="Microcredit Options">
+                <Skeleton className="h-32 w-full" />
+            </DashboardCard>
+             <DashboardCard title="Government Schemes">
+                <Skeleton className="h-32 w-full" />
+            </DashboardCard>
+        </div>
+    )
+  }
+
+  if (!farmerData) {
+    return <div className="text-center">No data available for this farmer.</div>
+  }
+
+  const { orders, payments, marketPrices, schemes } = farmerData
 
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
@@ -123,7 +145,7 @@ export default function FarmerDashboard() {
               <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.customer}</TableCell>
-                <TableCell>{order.amount}</TableCell>
+                <TableCell>₹{order.amount.toLocaleString()}</TableCell>
                 <TableCell>
                   <Badge variant={order.status === "Pending" ? "destructive" : "secondary"}>{order.status}</Badge>
                 </TableCell>
@@ -158,7 +180,7 @@ export default function FarmerDashboard() {
             {payments.map((payment) => (
               <TableRow key={payment.id} onClick={() => showToast('View Payment', `Viewing details for payment ${payment.id}`)} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.from}</TableCell>
-                <TableCell>{payment.amount}</TableCell>
+                <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
                 <TableCell className="text-right">{payment.date}</TableCell>
               </TableRow>
             ))}
@@ -172,7 +194,7 @@ export default function FarmerDashboard() {
         className="xl:col-span-2"
       >
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart accessibilityLayer data={chartData}>
+          <BarChart accessibilityLayer data={marketPrices}>
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="crop"
