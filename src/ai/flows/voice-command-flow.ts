@@ -8,7 +8,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'zod';
-import {generate} from 'genkit/generate';
+import { generate } from 'genkit';
 
 const VoiceCommandInputSchema = z.object({
   audioDataUri: z
@@ -95,7 +95,7 @@ Analyze the following audio command and provide the corresponding JSON output.`
       }
     });
 
-    const result = llmResponse.output();
+    const result = llmResponse.output;
     if (!result) {
         throw new Error("Failed to process voice command.");
     }
