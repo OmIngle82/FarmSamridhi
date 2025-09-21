@@ -22,6 +22,7 @@ import {
   MessageSquare,
   Milestone,
   PlusCircle,
+  HeartPulse,
 } from "lucide-react"
 
 import {
@@ -47,6 +48,7 @@ const navConfig = {
         { key: "payments", href: "/farmer/payments", icon: Wallet },
         { key: "marketPrices", href: "/farmer/market", icon: BarChart },
         { key: "finances", href: "/farmer/finances", icon: Landmark },
+        { key: "cropHealth", href: "/farmer/crop-health", icon: HeartPulse },
         { key: "govtSchemes", href: "/farmer/schemes", icon: BookOpen },
         { key: "profile", href: "/farmer/profile", icon: User },
     ],

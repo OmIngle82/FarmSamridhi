@@ -4,3 +4,4 @@ import './flows/journey-flow';
 import './flows/voice-command-flow';
 import './flows/get-audio-visualization-flow';
 import './flows/suggest-product-details-flow';
+import './flows/diagnose-plant-flow';
