@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "farm-hero",
+      "description": "A vibrant green farm under a sunny sky",
+      "imageUrl": "https://picsum.photos/seed/farmsamridhi-hero/1920/1080",
+      "imageHint": "farm landscape"
+    },
+    {
+      "id": "product-tomato",
+      "description": "Fresh ripe tomatoes",
+      "imageUrl": "https://picsum.photos/seed/tomato/400/300",
+      "imageHint": "fresh tomatoes"
+    },
+    {
+      "id": "product-wheat",
+      "description": "Sack of wheat grains",
+      "imageUrl": "https://picsum.photos/seed/wheat/400/300",
+      "imageHint": "wheat grains"
+    },
+    {
+      "id": "product-potato",
+      "description": "Freshly harvested potatoes",
+      "imageUrl": "https://picsum.photos/seed/potato/400/300",
+      "imageHint": "potatoes"
+    },
+    {
+      "id": "product-corn",
+      "description": "Ears of corn",
+      "imageUrl": "https://picsum.photos/seed/corn/400/300",
+      "imageHint": "corn cobs"
+    },
+    {
+      "id": "avatar-1",
+      "description": "Farmer avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar1/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-2",
+      "description": "Farmer avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar2/100/100",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar-3",
+      "description": "Farmer avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar3/100/100",
+      "imageHint": "person portrait"
+    }
+  ]
 }
