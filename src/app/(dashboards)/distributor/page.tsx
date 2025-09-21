@@ -157,4 +157,9 @@ export default function DistributorDashboard() {
               </div>
               <Progress value={item.level} aria-label={`${item.item} stock level`} />
             </div>
-          
+          ))}
+        </div>
+      </DashboardCard>
+    </div>
+  )
+}

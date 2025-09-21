@@ -81,7 +81,7 @@ export function SidebarNav() {
     // Fallback for when user role is not yet available or invalid
     if (pathname.startsWith("/farmer")) return navConfig.farmer
     if (pathname.startsWith("/distributor")) return navConfig.distributor
-    if (pathname.startsWith("/retailer")) return navConfig.retailer
+    if (pathname.startsWith("/retailer")) return nav-config.retailer
     if (pathname.startsWith("/consumer")) return navConfig.consumer
     return [];
   }
@@ -118,3 +118,20 @@ export function SidebarNav() {
                 </Link>
               </SidebarMenuItem>
             )
+          })}
+        </SidebarMenu>
+      </SidebarContent>
+      <SidebarContent className="!flex-grow-0">
+        <Separator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton tooltip="Settings">
+              <Users />
+              <span>Support</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarContent>
+    </>
+  )
+}
