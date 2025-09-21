@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { Logo } from "@/components/icons"
+import { Button } from "@/components/ui/button"
 import { Separator } from "../ui/separator"
 
 const farmerNav = [
