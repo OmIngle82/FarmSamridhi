@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import Link from "next/link"
@@ -128,10 +129,12 @@ export function SidebarNav() {
         <Separator />
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Settings">
-              <Users />
-              <span>Support</span>
-            </SidebarMenuButton>
+            <a href="mailto:support@farmsamridhi.com?subject=Support Request" className="w-full">
+                <SidebarMenuButton tooltip="Support">
+                <Users />
+                <span>Support</span>
+                </SidebarMenuButton>
+            </a>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarContent>
