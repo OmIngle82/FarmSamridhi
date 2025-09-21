@@ -121,12 +121,12 @@ export default function FarmerFinancesPage() {
                 </div>
                 <div className="border p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-muted-foreground">Active Loans</h3>
-                    <p className="text-2xl font-bold">₹0</p>
+                    <div className="text-2xl font-bold">₹0</div>
                      <p className="text-xs text-muted-foreground">No active loans</p>
                 </div>
                  <div className="border p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-muted-foreground">Subsidies Received</h3>
-                    <p className="text-2xl font-bold">₹5,000</p>
+                    <div className="text-2xl font-bold">₹5,000</div>
                     <p className="text-xs text-muted-foreground">from Govt. Subsidy</p>
                 </div>
             </div>
