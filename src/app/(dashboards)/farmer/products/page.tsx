@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, Suspense } from "react"
 import Image from "next/image"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -48,7 +48,7 @@ const productSchema = z.object({
 
 type ProductFormData = z.infer<typeof productSchema>
 
-export default function FarmerProductsPage() {
+function ProductsPageContent() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
   const queryClient = useQueryClient()
@@ -380,4 +380,12 @@ export default function FarmerProductsPage() {
       </DashboardCard>
     </div>
   )
+}
+
+export default function FarmerProductsPage() {
+    return (
+        <Suspense fallback={<DashboardCard title="Loading Products..."><Skeleton className="h-96 w-full" /></DashboardCard>}>
+            <ProductsPageContent />
+        </Suspense>
+    )
 }
