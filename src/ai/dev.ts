@@ -2,3 +2,4 @@
 import './flows/farmer-flow';
 import './flows/journey-flow';
 import './flows/voice-command-flow';
+import './flows/get-audio-visualization-flow';

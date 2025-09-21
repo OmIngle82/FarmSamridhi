@@ -12,9 +12,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Mic, Loader2, X, Waves } from "lucide-react"
+import { Mic, Loader2, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { handleVoiceCommand } from "@/ai/flows/voice-command-flow"
+import { getAudioVisualization, type AudioVisualizationOutput } from "@/ai/flows/get-audio-visualization-flow"
+import { AudioVisualizer } from "./audio-visualizer"
 
 type VoiceCommandDialogProps = {
   open: boolean
@@ -33,7 +35,8 @@ export function VoiceCommandDialog({
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
-
+  const [visualizationData, setVisualizationData] = useState<number[]>(Array(32).fill(0.1));
+  const visualizerIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const startRecording = async () => {
     setStatus("requesting")
@@ -50,6 +53,9 @@ export function VoiceCommandDialog({
       }
 
       mediaRecorderRef.current.onstop = async () => {
+        if (visualizerIntervalRef.current) {
+          clearInterval(visualizerIntervalRef.current);
+        }
         setStatus("processing")
         const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
         const reader = new FileReader()
@@ -84,6 +90,27 @@ export function VoiceCommandDialog({
 
       mediaRecorderRef.current.start()
       setStatus("listening")
+
+      // Start visualization
+      visualizerIntervalRef.current = setInterval(async () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+            // This is a simplified approach. A real app would send small audio chunks.
+            const tempBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+            if (tempBlob.size === 0) return;
+            const reader = new FileReader();
+            reader.readAsDataURL(tempBlob);
+            reader.onloadend = async () => {
+                const base64Audio = reader.result as string;
+                try {
+                    const vizData = await getAudioVisualization({ audioDataUri: base64Audio });
+                    setVisualizationData(vizData.waveform);
+                } catch (e) {
+                    console.error("Viz error", e);
+                }
+            }
+        }
+      }, 200);
+
     } catch (err) {
       console.error("Error accessing microphone:", err)
       toast({
@@ -108,6 +135,9 @@ export function VoiceCommandDialog({
         audioStream.getTracks().forEach(track => track.stop());
         setAudioStream(null);
     }
+    if (visualizerIntervalRef.current) {
+        clearInterval(visualizerIntervalRef.current);
+    }
   }
   
   const handleClose = () => {
@@ -118,6 +148,7 @@ export function VoiceCommandDialog({
   useEffect(() => {
     if (open) {
       setStatus("idle")
+      setVisualizationData(Array(32).fill(0.1));
     } else {
         stopRecording();
     }
@@ -136,8 +167,8 @@ export function VoiceCommandDialog({
 
         <div className="flex flex-col items-center justify-center h-48">
           {status === "listening" && (
-             <div className="flex flex-col items-center gap-4 text-primary">
-              <Waves className="h-16 w-16" />
+             <div className="flex flex-col items-center gap-4 text-primary w-full px-4">
+              <AudioVisualizer waveform={visualizationData} className="w-full h-16"/>
               <p>Listening...</p>
             </div>
           )}
