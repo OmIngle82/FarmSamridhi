@@ -30,6 +30,13 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+   webpack: (config, { isServer }) => {
+    // Fix for node-web-audio-api
+    if (isServer) {
+        config.externals.push('node-web-audio-api');
+    }
+    return config;
+  },
 };
 
 export default nextConfig;

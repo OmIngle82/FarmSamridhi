@@ -5,6 +5,7 @@ import Image from "next/image"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
+import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -49,6 +50,7 @@ type ProductFormData = z.infer<typeof productSchema>
 
 export default function FarmerProductsPage() {
   const { toast } = useToast()
+  const searchParams = useSearchParams()
   const [products, setProducts] = useState<Product[]>([])
   const [loading, setLoading] = useState(true)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -64,6 +66,18 @@ export default function FarmerProductsPage() {
       image: "",
     },
   })
+  
+  useEffect(() => {
+    const newProductName = searchParams.get("newProductName")
+    if (newProductName) {
+      form.setValue("name", newProductName)
+      toast({
+        title: "Add New Product",
+        description: `Please fill in the details for "${newProductName}".`,
+      });
+    }
+  }, [searchParams, form, toast]);
+
 
   useEffect(() => {
     async function fetchProducts() {

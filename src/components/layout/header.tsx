@@ -11,6 +11,7 @@ import {
   User,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { useState } from "react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
@@ -34,12 +35,14 @@ import { SidebarTrigger } from "@/components/ui/sidebar"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
+import { VoiceCommandDialog } from "@/components/voice-command-dialog"
 
 
 export function Header() {
   const router = useRouter()
   const userAvatar = placeholderImages.find(p => p.id === 'avatar-1');
   const { toast } = useToast()
+  const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-10 flex h-16 w-full items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -80,7 +83,7 @@ export function Header() {
           </Select>
         </div>
 
-        <Button variant="ghost" size="icon" aria-label="Use Voice Command" onClick={() => toast({ title: "Coming Soon", description: "Voice commands will be available soon." })}>
+        <Button variant="ghost" size="icon" aria-label="Use Voice Command" onClick={() => setIsVoiceDialogOpen(true)}>
           <Mic className="h-5 w-5" />
         </Button>
         <Button variant="ghost" size="icon" aria-label="Scan QR Code" onClick={() => router.push('/consumer')}>
@@ -121,13 +124,16 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push('/')}>
-              <LogOut className="mr-2 h-4 w-4" />
-              <span>Log out</span>
+             <DropdownMenuItem asChild>
+                <Link href="/">
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Log out</span>
+                </Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
+      <VoiceCommandDialog open={isVoiceDialogOpen} onOpenChange={setIsVoiceDialogOpen} />
     </header>
   )
 }
