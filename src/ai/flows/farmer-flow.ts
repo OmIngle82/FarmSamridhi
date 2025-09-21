@@ -47,6 +47,18 @@ const OrderSchema = z.object({
 
 export type Order = z.infer<typeof OrderSchema>;
 
+const OrderItemSchema = z.object({
+  productId: z.string(),
+  quantity: z.number(),
+});
+
+const AddOrderRequestSchema = z.object({
+  farmerId: z.string(),
+  distributorId: z.string(),
+  items: z.array(OrderItemSchema),
+});
+
+
 const PaymentSchema = z.object({
   id: z.string(),
   from: z.string(),
@@ -79,6 +91,7 @@ const InventoryItemSchema = z.object({
 export type InventoryItem = z.infer<typeof InventoryItemSchema>;
 
 const FarmerProfileSchema = z.object({
+    id: z.string(),
     name: z.string(),
     location: z.string(),
     avatarId: z.string(),
@@ -145,9 +158,9 @@ const mockInventory: InventoryItem[] = [
 ];
 
 const mockFarmers: FarmerProfile[] = [
-  { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
-  { name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2", phone: "9876543211" },
-  { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
+  { id: "FARM001", name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
+  { id: "FARM002", name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2", phone: "9876543211" },
+  { id: "FARM003", name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
 ]
 
 
@@ -162,6 +175,12 @@ export async function addProduct(
     input: z.infer<typeof AddProductRequestSchema>
 ): Promise<Product> {
     return addProductFlow(input);
+}
+
+export async function addOrder(
+    input: z.infer<typeof AddOrderRequestSchema>
+): Promise<Order> {
+    return addOrderFlow(input);
 }
 
 export async function updateProduct(
@@ -216,6 +235,38 @@ const addProductFlow = ai.defineFlow(
   }
 );
 
+const addOrderFlow = ai.defineFlow(
+  {
+    name: 'addOrderFlow',
+    inputSchema: AddOrderRequestSchema,
+    outputSchema: OrderSchema,
+  },
+  async ({ farmerId, distributorId, items }) => {
+    console.log(`Adding order from distributor ${distributorId} for farmer ${farmerId}`);
+    
+    // In a real app, you'd fetch the distributor's name
+    const customerName = "New Distributor Order";
+    
+    let totalAmount = 0;
+    items.forEach(item => {
+        const product = mockProducts.find(p => p.id === item.productId);
+        if (product) {
+            totalAmount += product.price * item.quantity;
+        }
+    });
+
+    const newOrder: Order = {
+      id: `ORD${String(mockOrders.length + 10).padStart(3, '0')}`,
+      customer: customerName,
+      amount: totalAmount,
+      status: "Pending",
+      phone: "9123456789" // Placeholder phone
+    };
+    mockOrders.unshift(newOrder); // Add to the top of the list
+    return newOrder;
+  }
+);
+
 const updateProductFlow = ai.defineFlow(
   {
     name: 'updateProductFlow',
@@ -249,3 +300,5 @@ const deleteProductFlow = ai.defineFlow(
     return { success: false };
   }
 );
+
+    

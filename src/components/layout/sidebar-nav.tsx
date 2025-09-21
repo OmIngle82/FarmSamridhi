@@ -22,6 +22,7 @@ import {
   QrCode,
   MessageSquare,
   Milestone,
+  PlusCircle,
 } from "lucide-react"
 
 import {
@@ -50,6 +51,7 @@ const navConfig = {
     ],
     distributor: [
         { name: "Dashboard", href: "/distributor", icon: Home },
+        { name: "New Order", href: "/distributor/new-order", icon: PlusCircle },
         { name: "Farmers", href: "/distributor", icon: Users }, // Changed to point to main dashboard for now
         { name: "Orders", href: "/distributor", icon: Truck }, // Changed to point to main dashboard for now
         { name: "Negotiations", href: "/distributor/negotiate", icon: MessageSquare },
@@ -141,3 +143,5 @@ export function SidebarNav() {
     </>
   )
 }
+
+    
