@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, Suspense, useRef } from "react"
@@ -32,7 +33,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 import { useToast } from "@/hooks/use-toast"
-import { addProduct, getProducts, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
+import { addProduct, getFarmerData, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
 import { suggestProductDetails } from "@/ai/flows/suggest-product-details-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Upload, X, Trash2, Edit, Sparkles, Loader2 } from "lucide-react"
@@ -60,8 +61,9 @@ function ProductsPageContent() {
   const suggestionAppliedRef = useRef(false);
 
   const { data: products = [], isLoading: loading, error } = useQuery<Product[]>({
-      queryKey: ['products'],
-      queryFn: () => getProducts("FARM001")
+      queryKey: ['farmerData'],
+      queryFn: () => getFarmerData({ farmerId: "FARM001" }),
+      select: (data) => data.products,
   });
 
   useEffect(() => {
@@ -78,7 +80,7 @@ function ProductsPageContent() {
   const addProductMutation = useMutation({
     mutationFn: (newProduct: Omit<ProductFormData, 'id'>) => addProduct({ farmerId: "FARM001", ...newProduct }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['farmerData'] });
       toast({ title: "Success", description: "Product added successfully." });
       resetForm();
     },
@@ -91,7 +93,7 @@ function ProductsPageContent() {
   const updateProductMutation = useMutation({
     mutationFn: (updatedProduct: Product) => updateProduct(updatedProduct),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['farmerData'] });
       toast({ title: "Success", description: "Product updated successfully." });
       resetForm();
     },
@@ -104,7 +106,7 @@ function ProductsPageContent() {
   const deleteProductMutation = useMutation({
     mutationFn: (productId: string) => deleteProduct({ productId }),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] });
+      queryClient.invalidateQueries({ queryKey: ['farmerData'] });
       toast({ title: "Success", description: "Product deleted successfully." });
     },
     onError: (error) => {
@@ -374,7 +376,7 @@ function ProductsPageContent() {
                 ))}
             </div>
         ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
+          <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground py-12">
             <p className="text-lg font-medium">No products yet.</p>
             <p>Use the form on the left to add your first product.</p>
           </div>
@@ -447,5 +449,3 @@ export default function FarmerProductsPage() {
         </Suspense>
     )
 }
-
-    

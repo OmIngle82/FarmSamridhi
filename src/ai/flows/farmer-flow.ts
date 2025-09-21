@@ -127,40 +127,6 @@ export async function getFarmerData(
   return getFarmerDataFlow(input);
 }
 
-export async function getProducts(
-  farmerId: string
-): Promise<Product[]> {
-    console.log(`Fetching products for farmer: ${farmerId}`);
-    return Promise.resolve(mockProducts);
-}
-
-export async function getOrders(
-  farmerId: string
-): Promise<Order[]> {
-    console.log(`Fetching orders for farmer: ${farmerId}`);
-    return Promise.resolve(mockOrders);
-}
-
-export async function getPayments(
-  farmerId: string
-): Promise<Payment[]> {
-    console.log(`Fetching payments for farmer: ${farmerId}`);
-    return Promise.resolve(mockPayments);
-}
-
-export async function getMarketPrices(
-  farmerId: string
-): Promise<MarketPrice[]> {
-    console.log(`Fetching market prices for farmer: ${farmerId}`);
-    return Promise.resolve(mockMarketPrices);
-}
-
-export async function getSchemes(
-  farmerId: string
-): Promise<Scheme[]> {
-    console.log(`Fetching schemes for farmer: ${farmerId}`);
-    return Promise.resolve(mockSchemes);
-}
 
 export async function addProduct(
     input: z.infer<typeof AddProductRequestSchema>
@@ -188,7 +154,8 @@ const getFarmerDataFlow = ai.defineFlow(
   },
   async ({ farmerId }) => {
     console.log(`Fetching data for farmer: ${farmerId}`);
-
+    // In a real application, you would fetch from multiple database sources here.
+    // For this prototype, we return the mock data.
     return {
       products: mockProducts,
       orders: mockOrders,

@@ -1,3 +1,4 @@
+
 "use client"
 import {
   Accordion,
@@ -9,7 +10,7 @@ import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getSchemes } from "@/ai/flows/farmer-flow"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -17,8 +18,9 @@ export default function FarmerSchemesPage() {
   const { toast } = useToast()
 
   const { data: schemes, isLoading: loading, error } = useQuery({
-    queryKey: ['schemes'],
-    queryFn: () => getSchemes("FARM001")
+    queryKey: ['farmerData'],
+    queryFn: () => getFarmerData({ farmerId: "FARM001" }),
+    select: (data) => data.schemes,
   });
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export default function FarmerSchemesPage() {
             <Skeleton className="h-12 w-full" />
         </div>
       ) : !schemes || schemes.length === 0 ? (
-         <div className="text-center text-muted-foreground">No schemes available at the moment.</div>
+         <div className="text-center text-muted-foreground py-12">No schemes available at the moment.</div>
       ) : (
         <Accordion type="single" collapsible className="w-full">
             {schemes.map(scheme => (

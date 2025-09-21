@@ -1,3 +1,4 @@
+
 "use client"
 
 import Image from 'next/image'
@@ -15,7 +16,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { PackageSearch, Plus, Tractor } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getProducts, type Product } from "@/ai/flows/farmer-flow"
+import { getFarmerData, type Product } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from '@tanstack/react-query'
 
@@ -29,8 +30,9 @@ export default function RetailerDashboard() {
   const { toast } = useToast()
 
   const { data: products, isLoading: loading, error } = useQuery({
-    queryKey: ['allProducts'],
-    queryFn: () => getProducts("FARM001")
+    queryKey: ['farmerData'],
+    queryFn: () => getFarmerData({ farmerId: "FARM001" }),
+    select: (data) => data.products,
   });
 
   useEffect(() => {
@@ -70,7 +72,7 @@ export default function RetailerDashboard() {
                 ))}
             </div>
         ) : !products || products.length === 0 ? (
-            <div className="text-center text-muted-foreground">No products available.</div>
+            <div className="text-center text-muted-foreground py-12">No products available.</div>
         ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((product) => (

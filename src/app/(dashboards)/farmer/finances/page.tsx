@@ -1,3 +1,4 @@
+
 "use client"
 import {
   Table,
@@ -12,21 +13,23 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, Download, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getPayments } from "@/ai/flows/farmer-flow"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
 export default function FarmerFinancesPage() {
   const { toast } = useToast()
 
-  const { data: payments, isLoading: loading, error } = useQuery({
-    queryKey: ['payments'],
-    queryFn: () => getPayments("FARM001")
+  const { data: farmerData, isLoading: loading, error } = useQuery({
+      queryKey: ['farmerData'],
+      queryFn: () => getFarmerData({ farmerId: "FARM001" })
   });
+  
+  const payments = farmerData?.payments;
 
   useEffect(() => {
     if (error) {
-        console.error("Failed to fetch payments:", error)
+        console.error("Failed to fetch financial data:", error)
         toast({
           variant: "destructive",
           title: "Error",
@@ -51,7 +54,7 @@ export default function FarmerFinancesPage() {
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="border p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-muted-foreground">Total Income</h3>
-                    <p className="text-2xl font-bold">₹{totalIncome.toLocaleString()}</p>
+                    <p className="text-2xl font-bold">₹{loading ? <Skeleton className="h-8 w-32 mt-1" /> : totalIncome.toLocaleString()}</p>
                 </div>
                 <div className="border p-4 rounded-lg">
                     <h3 className="text-sm font-medium text-muted-foreground">Active Loans</h3>
@@ -84,7 +87,7 @@ export default function FarmerFinancesPage() {
         {loading ? (
             <Skeleton className="h-60 w-full" />
         ) : !payments || payments.length === 0 ? (
-            <div className="text-center text-muted-foreground">No payments found.</div>
+            <div className="text-center text-muted-foreground py-12">No payments found.</div>
         ) : (
             <Table>
             <TableHeader>

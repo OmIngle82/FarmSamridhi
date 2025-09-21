@@ -1,3 +1,4 @@
+
 "use client"
 import {
   Bar,
@@ -13,7 +14,7 @@ import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/compo
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getMarketPrices } from "@/ai/flows/farmer-flow"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -32,8 +33,9 @@ export default function FarmerMarketPage() {
   const { toast } = useToast()
 
   const { data: marketPrices, isLoading: loading, error } = useQuery({
-    queryKey: ['marketPrices'],
-    queryFn: () => getMarketPrices("FARM001")
+    queryKey: ['farmerData'],
+    queryFn: () => getFarmerData({ farmerId: "FARM001" }),
+    select: (data) => data.marketPrices,
   });
 
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function FarmerMarketPage() {
       {loading ? (
         <Skeleton className="h-96 w-full" />
       ) : !marketPrices || marketPrices.length === 0 ? (
-         <div className="text-center text-muted-foreground">No market data available.</div>
+         <div className="text-center text-muted-foreground py-12">No market data available.</div>
       ) : (
         <ChartContainer config={chartConfig} className="min-h-[400px] w-full">
           <BarChart accessibilityLayer data={marketPrices}>

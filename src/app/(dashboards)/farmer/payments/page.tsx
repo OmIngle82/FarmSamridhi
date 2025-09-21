@@ -1,3 +1,4 @@
+
 "use client"
 import {
   Table,
@@ -10,7 +11,7 @@ import {
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getPayments } from "@/ai/flows/farmer-flow"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -18,8 +19,9 @@ export default function FarmerPaymentsPage() {
   const { toast } = useToast()
 
   const { data: payments, isLoading: loading, error } = useQuery({
-    queryKey: ['farmerPayments'],
-    queryFn: () => getPayments("FARM001")
+    queryKey: ['farmerData'],
+    queryFn: () => getFarmerData({ farmerId: "FARM001" }),
+    select: (data) => data.payments,
   });
 
   useEffect(() => {
@@ -42,7 +44,7 @@ export default function FarmerPaymentsPage() {
       {loading ? (
         <Skeleton className="h-60 w-full" />
       ) : !payments || payments.length === 0 ? (
-        <div className="text-center text-muted-foreground">No payments found.</div>
+        <div className="text-center text-muted-foreground py-12">No payments found.</div>
       ) : (
         <Table>
           <TableHeader>

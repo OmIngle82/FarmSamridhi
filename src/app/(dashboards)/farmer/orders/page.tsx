@@ -1,3 +1,4 @@
+
 "use client"
 import Link from "next/link"
 import {
@@ -14,7 +15,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { MessageSquare, Phone } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getOrders } from "@/ai/flows/farmer-flow"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 
@@ -22,8 +23,9 @@ export default function FarmerOrdersPage() {
   const { toast } = useToast()
 
   const { data: orders, isLoading: loading, error } = useQuery({
-      queryKey: ['farmerOrders'],
-      queryFn: () => getOrders("FARM001")
+      queryKey: ['farmerData'],
+      queryFn: () => getFarmerData({ farmerId: "FARM001" }),
+      select: (data) => data.orders,
   });
 
   useEffect(() => {
@@ -46,7 +48,7 @@ export default function FarmerOrdersPage() {
       {loading ? (
         <Skeleton className="h-60 w-full" />
       ) : !orders || orders.length === 0 ? (
-        <div className="text-center text-muted-foreground">No orders found.</div>
+        <div className="text-center text-muted-foreground py-12">No orders found.</div>
       ) : (
         <Table>
           <TableHeader>
