@@ -36,36 +36,38 @@ import { Logo } from "@/components/icons"
 import { Button } from "@/components/ui/button"
 import { Separator } from "../ui/separator"
 import { useAuth } from "@/contexts/auth-context"
+import { useI18n } from "@/contexts/i18n-context"
+
 
 const navConfig = {
     farmer: [
-        { name: "Dashboard", href: "/farmer", icon: Home },
-        { name: "My Products", href: "/farmer/products", icon: Leaf },
-        { name: "Orders", href: "/farmer/orders", icon: Package },
-        { name: "Payments", href: "/farmer/payments", icon: Wallet },
-        { name: "Market Prices", href: "/farmer/market", icon: BarChart },
-        { name: "Finances", href: "/farmer/finances", icon: Landmark },
-        { name: "Govt. Schemes", href: "/farmer/schemes", icon: BookOpen },
-        { name: "Profile", href: "/farmer/profile", icon: User },
+        { key: "dashboard", href: "/farmer", icon: Home },
+        { key: "myProducts", href: "/farmer/products", icon: Leaf },
+        { key: "orders", href: "/farmer/orders", icon: Package },
+        { key: "payments", href: "/farmer/payments", icon: Wallet },
+        { key: "marketPrices", href: "/farmer/market", icon: BarChart },
+        { key: "finances", href: "/farmer/finances", icon: Landmark },
+        { key: "govtSchemes", href: "/farmer/schemes", icon: BookOpen },
+        { key: "profile", href: "/farmer/profile", icon: User },
     ],
     distributor: [
-        { name: "Dashboard", href: "/distributor", icon: Home },
-        { name: "New Order", href: "/distributor/new-order", icon: PlusCircle },
-        { name: "Orders", href: "/distributor", icon: Truck }, // Changed to point to main dashboard for now
-        { name: "Negotiations", href: "/distributor/negotiate?orderId=ORD001", icon: MessageSquare },
-        { name: "Inventory", href: "/distributor", icon: Package }, // Changed to point to main dashboard for now
+        { key: "dashboard", href: "/distributor", icon: Home },
+        { key: "newOrder", href: "/distributor/new-order", icon: PlusCircle },
+        { key: "orders", href: "/distributor", icon: Truck },
+        { key: "negotiations", href: "/distributor/negotiate?orderId=ORD001", icon: MessageSquare },
+        { key: "inventory", href: "/distributor", icon: Package },
     ],
     retailer: [
-        { name: "Dashboard", href: "/retailer", icon: Home },
-        { name: "Source Products", href: "/retailer", icon: ShoppingCart },
-        { name: "Trace Journey", href: "/journey?productId=PROD001", icon: Milestone },
-        { name: "Transactions", href: "/retailer", icon: Wallet },
+        { key: "dashboard", href: "/retailer", icon: Home },
+        { key: "sourceProducts", href: "/retailer", icon: ShoppingCart },
+        { key: "traceJourney", href: "/journey?productId=PROD001", icon: Milestone },
+        { key: "transactions", href: "/retailer", icon: Wallet },
     ],
     consumer: [
-        { name: "Dashboard", href: "/consumer", icon: Home },
-        { name: "Scan Product", href: "/consumer", icon: QrCode },
-        { name: "My Purchases", href: "/consumer", icon: ShoppingCart }, // Placeholder
-        { name: "Favorite Farmers", href: "/consumer", icon: HeartHandshake }, // Placeholder
+        { key: "dashboard", href: "/consumer", icon: Home },
+        { key: "scanProduct", href: "/consumer", icon: QrCode },
+        { key: "myPurchases", href: "/consumer", icon: ShoppingCart },
+        { key: "favoriteFarmers", href: "/consumer", icon: HeartHandshake },
     ]
 };
 
@@ -73,6 +75,7 @@ const navConfig = {
 export function SidebarNav() {
   const pathname = usePathname()
   const { user } = useAuth()
+  const { t } = useI18n();
   
   const getNavItems = () => {
     const role = user?.role;
@@ -107,15 +110,16 @@ export function SidebarNav() {
         <SidebarMenu>
           {navItems.map((item) => {
             const Icon = item.icon
+            const name = t(item.key as any);
             return (
-              <SidebarMenuItem key={item.name}>
+              <SidebarMenuItem key={item.key}>
                  <Link href={item.href} className="w-full">
                     <SidebarMenuButton
                         isActive={pathname === item.href}
-                        tooltip={item.name}
+                        tooltip={name}
                     >
                         <Icon />
-                        <span>{item.name}</span>
+                        <span>{name}</span>
                     </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
@@ -128,9 +132,9 @@ export function SidebarNav() {
         <SidebarMenu>
           <SidebarMenuItem>
             <a href="mailto:support@farmsamridhi.com?subject=Support Request" className="w-full">
-                <SidebarMenuButton tooltip="Support">
+                <SidebarMenuButton tooltip={t('support')}>
                 <Users />
-                <span>Support</span>
+                <span>{t('support')}</span>
                 </SidebarMenuButton>
             </a>
           </SidebarMenuItem>

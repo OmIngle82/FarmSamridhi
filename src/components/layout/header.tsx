@@ -34,17 +34,17 @@ import {
 } from "@/components/ui/select"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { placeholderImages } from "@/lib/placeholder-images"
-import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { VoiceCommandDialog } from "@/components/voice-command-dialog"
 import { useAuth } from "@/contexts/auth-context"
+import { useI18n } from "@/contexts/i18n-context"
 
 
 export function Header() {
   const router = useRouter()
   const { user, logout } = useAuth()
+  const { t, changeLanguage } = useI18n();
   const userAvatar = placeholderImages.find(p => p.id === 'avatar-1');
-  const { toast } = useToast()
   const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
 
   const handleLogout = () => {
@@ -52,16 +52,6 @@ export function Header() {
     router.push('/');
   }
   
-  const handleLanguageChange = (value: string) => {
-    let languageName = "English";
-    if (value === "hi") languageName = "हिन्दी";
-    if (value === "mr") languageName = "मराठी";
-    toast({
-      title: "Language Changed",
-      description: `App language set to ${languageName}. (UI translation coming soon!)`,
-    })
-  }
-
   return (
     <header className="sticky top-0 z-10 flex h-16 w-full items-center gap-4 border-b bg-background px-4 md:px-6">
       <div className="flex items-center gap-2">
@@ -89,9 +79,9 @@ export function Header() {
       <div className="flex flex-1 items-center justify-end gap-4">
         <div className="flex items-center gap-2">
           <Languages className="h-5 w-5 text-muted-foreground" />
-          <Select defaultValue="en" onValueChange={handleLanguageChange}>
+          <Select defaultValue="en" onValueChange={changeLanguage}>
             <SelectTrigger className="w-[120px] h-9">
-              <SelectValue placeholder="Language" />
+              <SelectValue placeholder={t('language')} />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="en">English</SelectItem>
@@ -133,20 +123,20 @@ export function Header() {
                <DropdownMenuItem asChild>
                 <Link href={`/${user?.role}/profile`}>
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profile</span>
+                  <span>{t('profile')}</span>
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem asChild>
                  <Link href={`/${user?.role}/profile`}>
                     <Settings className="mr-2 h-4 w-4" />
-                    <span>Settings</span>
+                    <span>{t('settings')}</span>
                 </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
              <DropdownMenuItem onClick={handleLogout}>
                 <LogOut className="mr-2 h-4 w-4" />
-                <span>Log out</span>
+                <span>{t('logout')}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
