@@ -1,4 +1,3 @@
-
 "use client"
 import {
   Accordion,
@@ -29,6 +28,7 @@ import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 
 import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, MessageCircle, Phone, PlusCircle } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const chartData = [
   { crop: "Wheat", price: 2150, target: 2200 },
@@ -50,9 +50,9 @@ const chartConfig = {
 } satisfies ChartConfig
 
 const orders = [
-  { id: "ORD001", customer: "BigBasket", amount: "₹12,500", status: "Pending" },
-  { id: "ORD002", customer: "Local Mandi", amount: "₹8,200", status: "Shipped" },
-  { id: "ORD003", customer: "Reliance Fresh", amount: "₹25,000", status: "Pending" },
+  { id: "ORD001", customer: "BigBasket", amount: "₹12,500", status: "Pending", phone: "9123456780" },
+  { id: "ORD002", customer: "Local Mandi", amount: "₹8,200", status: "Shipped", phone: "9123456781" },
+  { id: "ORD003", customer: "Reliance Fresh", amount: "₹25,000", status: "Pending", phone: "9123456782" },
 ]
 
 const payments = [
@@ -80,6 +80,15 @@ const schemes = [
 ]
 
 export default function FarmerDashboard() {
+  const { toast } = useToast()
+  
+  const showToast = (title: string, description: string) => {
+    toast({
+        title,
+        description,
+    });
+  };
+
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-2 xl:grid-cols-4">
       <DashboardCard
@@ -87,10 +96,10 @@ export default function FarmerDashboard() {
         className="xl:col-span-4"
       >
         <div className="flex gap-4">
-            <Button>
+            <Button onClick={() => showToast('Add Product', 'Functionality to add a new product is coming soon!')}>
                 <PlusCircle className="mr-2 h-4 w-4" /> Add New Product
             </Button>
-            <Button variant="secondary">Manage Profile</Button>
+            <Button variant="secondary" onClick={() => showToast('Manage Profile', 'Profile management page is not yet available.')}>Manage Profile</Button>
         </div>
       </DashboardCard>
 
@@ -120,8 +129,10 @@ export default function FarmerDashboard() {
                 </TableCell>
                 <TableCell className="text-right">
                     <div className="flex gap-2 justify-end">
-                        <Button variant="outline" size="sm">Negotiate</Button>
-                        <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4"/></Button>
+                        <Button variant="outline" size="sm" onClick={() => showToast('Negotiate', `Starting negotiation for ${order.id}`)}>Negotiate</Button>
+                        <a href={`tel:${order.phone}`}>
+                          <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4"/></Button>
+                        </a>
                     </div>
                 </TableCell>
               </TableRow>
@@ -145,7 +156,7 @@ export default function FarmerDashboard() {
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id}>
+              <TableRow key={payment.id} onClick={() => showToast('View Payment', `Viewing details for payment ${payment.id}`)} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.from}</TableCell>
                 <TableCell>{payment.amount}</TableCell>
                 <TableCell className="text-right">{payment.date}</TableCell>
@@ -184,7 +195,7 @@ export default function FarmerDashboard() {
       >
         <div className="flex flex-col h-full justify-between">
             <p className="text-muted-foreground mb-4">Get quick and easy access to microloans from our partner institutions with competitive interest rates.</p>
-            <Button className="w-full mt-auto">
+            <Button className="w-full mt-auto" onClick={() => showToast('Loan Application', 'Redirecting to loan application portal...')}>
                 <DollarSign className="mr-2 h-4 w-4" />
                 Apply for a Loan
             </Button>
@@ -202,7 +213,7 @@ export default function FarmerDashboard() {
                     <AccordionContent>
                         <p className="mb-2">{scheme.description}</p>
                         <p><strong className="font-medium">Eligibility: </strong>{scheme.eligibility}</p>
-                        <Button variant="link" className="px-0 h-auto mt-2">Learn More</Button>
+                        <Button variant="link" className="px-0 h-auto mt-2" onClick={() => showToast('Learn More', `Opening details for ${scheme.name}`)}>Learn More</Button>
                     </AccordionContent>
                 </AccordionItem>
             ))}

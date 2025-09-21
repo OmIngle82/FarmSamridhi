@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { Star, QrCode, Send } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const purchases = [
   { id: "P001", name: "Fresh Tomatoes", farmer: "Suresh Patel", avatarId: "product-tomato", date: "2024-07-22", rating: 0 },
@@ -14,6 +15,7 @@ const purchases = [
 ]
 
 export default function ConsumerDashboard() {
+  const { toast } = useToast()
   const [ratings, setRatings] = useState(purchases.reduce((acc, p) => ({...acc, [p.id]: p.rating }), {} as Record<string, number>));
   const [hoverRatings, setHoverRatings] = useState<Record<string, number>>({});
 
@@ -25,6 +27,13 @@ export default function ConsumerDashboard() {
     setHoverRatings(prev => ({...prev, [id]: rating}));
   }
 
+  const showToast = (title: string, description: string) => {
+    toast({
+        title,
+        description,
+    });
+  };
+
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-2">
       <DashboardCard
@@ -34,9 +43,9 @@ export default function ConsumerDashboard() {
         <div className="flex flex-col gap-4">
           <div className="flex gap-2">
             <Input placeholder="Enter Product ID" />
-            <Button>Track</Button>
+            <Button onClick={() => showToast('Product Tracking', 'Feature coming soon!')}>Track</Button>
           </div>
-          <Button variant="outline" className="w-full">
+          <Button variant="outline" className="w-full" onClick={() => showToast('QR Scanner', 'Opening QR code scanner...')}>
             <QrCode className="mr-2 h-4 w-4" /> Scan QR Code
           </Button>
         </div>
@@ -77,13 +86,16 @@ export default function ConsumerDashboard() {
                                 : 'text-muted-foreground/50'
                             }`}
                             onMouseEnter={() => handleSetHoverRating(purchase.id, star)}
-                            onClick={() => handleSetRating(purchase.id, star)}
+                            onClick={() => {
+                                handleSetRating(purchase.id, star)
+                                showToast('Rating Submitted', `You rated ${purchase.name} ${star} stars.`)
+                            }}
                             />
                         ))}
                     </div>
                     <div className="flex w-full gap-2">
                         <Input placeholder="Leave feedback..." className="h-9"/>
-                        <Button size="icon" className="h-9 w-9 flex-shrink-0"><Send className="h-4 w-4"/></Button>
+                        <Button size="icon" className="h-9 w-9 flex-shrink-0" onClick={() => showToast('Feedback Sent', 'Thank you for your feedback!')}><Send className="h-4 w-4"/></Button>
                     </div>
                 </div>
               </div>

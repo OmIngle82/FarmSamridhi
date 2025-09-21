@@ -1,3 +1,5 @@
+"use client"
+
 import Image from 'next/image'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -12,6 +14,7 @@ import {
 import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { PackageSearch, Plus, Tractor } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const products = [
   { name: "Fresh Tomatoes", farmer: "Suresh Patel", location: "Nashik", price: "₹25/kg", avatarId: "product-tomato" },
@@ -27,6 +30,15 @@ const transactions = [
 ]
 
 export default function RetailerDashboard() {
+  const { toast } = useToast()
+
+  const showToast = (title: string, description: string) => {
+    toast({
+        title,
+        description,
+    });
+  };
+
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
       <DashboardCard
@@ -48,11 +60,11 @@ export default function RetailerDashboard() {
                   <p className="text-sm text-muted-foreground">{product.location}</p>
                   <div className="flex justify-between items-center mt-4">
                     <span className="font-bold text-lg">{product.price}</span>
-                    <Button size="sm">
+                    <Button size="sm" onClick={() => showToast('Product Added', `${product.name} added to your cart.`)}>
                       <Plus className="mr-1 h-4 w-4" /> Buy
                     </Button>
                   </div>
-                   <Button variant="outline" size="sm" className="w-full mt-2">
+                   <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => showToast('Trace Origin', `Tracing origin for ${product.name}...`)}>
                         <PackageSearch className="mr-2 h-4 w-4" /> Trace Origin
                     </Button>
                 </div>
@@ -79,7 +91,7 @@ export default function RetailerDashboard() {
           </TableHeader>
           <TableBody>
             {transactions.map((transaction) => (
-              <TableRow key={transaction.id}>
+              <TableRow key={transaction.id} onClick={() => showToast('View Transaction', `Viewing details for transaction ${transaction.id}`)} className="cursor-pointer">
                 <TableCell className="font-medium">{transaction.id}</TableCell>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.item}</TableCell>

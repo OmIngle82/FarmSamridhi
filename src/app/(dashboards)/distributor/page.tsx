@@ -1,3 +1,5 @@
+"use client"
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -13,11 +15,12 @@ import {
 import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
+import { useToast } from "@/hooks/use-toast"
 
 const farmers = [
-  { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1" },
-  { name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2" },
-  { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3" },
+  { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
+  { name: "Priya Singh", location: "Hapur, Uttar Pradesh", avatarId: "avatar-2", phone: "9876543211" },
+  { name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", phone: "9876543212" },
 ]
 
 const orders = [
@@ -33,6 +36,15 @@ const inventory = [
 ]
 
 export default function DistributorDashboard() {
+  const { toast } = useToast()
+
+  const showToast = (title: string, description: string) => {
+    toast({
+        title,
+        description,
+    });
+  };
+  
   return (
     <div className="grid gap-6 md:gap-8 grid-cols-1 lg:grid-cols-3">
       <DashboardCard
@@ -56,13 +68,17 @@ export default function DistributorDashboard() {
                   </div>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4" /></Button>
-                    <Button variant="outline" size="icon" className="h-8 w-8"><MessageCircle className="h-4 w-4" /></Button>
+                    <a href={`tel:${farmer.phone}`}>
+                      <Button variant="outline" size="icon" className="h-8 w-8"><Phone className="h-4 w-4" /></Button>
+                    </a>
+                    <a href={`sms:${farmer.phone}`}>
+                      <Button variant="outline" size="icon" className="h-8 w-8"><MessageCircle className="h-4 w-4" /></Button>
+                    </a>
                 </div>
               </div>
             )
           })}
-           <Button className="w-full mt-4">
+           <Button className="w-full mt-4" onClick={() => showToast('New Order', 'Feature to initiate new order is coming soon!')}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Initiate a new order
           </Button>
@@ -86,7 +102,7 @@ export default function DistributorDashboard() {
           </TableHeader>
           <TableBody>
             {orders.map((order) => (
-              <TableRow key={order.id}>
+              <TableRow key={order.id} onClick={() => showToast('View Order', `Viewing details for order ${order.id}`)} className="cursor-pointer">
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.farmer}</TableCell>
                 <TableCell>{order.item}</TableCell>
