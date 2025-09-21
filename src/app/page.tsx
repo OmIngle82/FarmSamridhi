@@ -70,8 +70,7 @@ export default function Home() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {roles.map((role) => (
-                <Link href={role.href} key={role.name} legacyBehavior passHref>
-                  <a className="block transform hover:-translate-y-2 transition-transform duration-300">
+                <Link href={role.href} key={role.name} className="block transform hover:-translate-y-2 transition-transform duration-300">
                     <Card className="h-full text-center hover:shadow-2xl hover:border-primary transition-shadow duration-300">
                       <CardHeader className="flex flex-col items-center">
                         {role.icon}
@@ -86,7 +85,6 @@ export default function Home() {
                         </Button>
                       </CardContent>
                     </Card>
-                  </a>
                 </Link>
               ))}
             </div>
