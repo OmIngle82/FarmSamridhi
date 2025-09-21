@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A flow to retrieve all data for the farmer dashboard.
@@ -159,14 +160,6 @@ export async function getSchemes(
 ): Promise<Scheme[]> {
     console.log(`Fetching schemes for farmer: ${farmerId}`);
     return Promise.resolve(mockSchemes);
-}
-
-
-export async function getOrder(
-  orderId: string
-): Promise<Order | undefined> {
-    console.log(`Fetching order: ${orderId}`);
-    return Promise.resolve(mockOrders.find(o => o.id === orderId));
 }
 
 export async function addProduct(

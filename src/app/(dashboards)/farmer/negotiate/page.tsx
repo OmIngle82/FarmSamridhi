@@ -1,76 +1,117 @@
+
 "use client"
 
 import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
+import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, type Timestamp } from "firebase/firestore";
+
 import { DashboardCard } from "@/components/dashboard-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
-import { getOrder, type Order } from '@/ai/flows/farmer-flow'
+import { type Order, getOrders } from '@/ai/flows/farmer-flow'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft, Send } from 'lucide-react'
-import { Badge } from '@/components/ui/badge'
-import Link from 'next/link'
+import { db } from '@/lib/firebase';
+import { useAuth } from '@/contexts/auth-context'
 
 interface Message {
+  id?: string;
   sender: 'farmer' | 'buyer';
   text: string;
+  timestamp: Timestamp | null;
 }
 
+// Mock order data - in a real app, this would be fetched from your database
+const mockOrders: Order[] = [
+    { id: "ORD001", customer: "BigBasket", amount: 12500, status: "Pending", phone: "9123456780" },
+    { id: "ORD002", customer: "Local Mandi", amount: 8200, status: "Shipped", phone: "9123456781" },
+    { id: "ORD003", customer: "Reliance Fresh", amount: 25000, status: "Pending", phone: "9123456782" },
+];
+
+
 function NegotiateContent() {
-    const searchParams = useSearchParams()
-    const { toast } = useToast()
-    const orderId = searchParams.get('orderId')
+    const { user } = useAuth();
+    const searchParams = useSearchParams();
+    const { toast } = useToast();
+    const orderId = searchParams.get('orderId');
     
-    const [order, setOrder] = useState<Order | null>(null)
-    const [loading, setLoading] = useState(true)
-    const [messages, setMessages] = useState<Message[]>([])
-    const [newMessage, setNewMessage] = useState("")
-    const chatEndRef = useRef<HTMLDivElement>(null)
+    const [order, setOrder] = useState<Order | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState<Message[]>([]);
+    const [newMessage, setNewMessage] = useState("");
+    const [isSending, setIsSending] = useState(false);
+    const chatEndRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        async function fetchOrder() {
-            if (!orderId) {
-                setLoading(false)
-                toast({ variant: "destructive", title: "Error", description: "No order ID provided." })
-                return
-            }
-            try {
-                const fetchedOrder = await getOrder(orderId)
-                if (fetchedOrder) {
-                    setOrder(fetchedOrder)
-                    setMessages([
-                        { sender: 'buyer', text: `Hello! We'd like to place an order for ₹${fetchedOrder.amount.toLocaleString()}.` },
-                        { sender: 'buyer', text: `We can offer ₹${(fetchedOrder.amount * 0.9).toLocaleString()} for this bulk purchase.` },
-                    ])
-                } else {
-                     toast({ variant: "destructive", title: "Error", description: "Order not found." })
-                }
-            } catch (error) {
-                console.error("Failed to fetch order:", error)
-                toast({ variant: "destructive", title: "Error", description: "Could not load order details." })
-            } finally {
-                setLoading(false)
-            }
+        if (!orderId) {
+            setLoading(false);
+            toast({ variant: "destructive", title: "Error", description: "No order ID provided." });
+            return;
         }
-        fetchOrder()
-    }, [orderId, toast])
+
+        // Fetch mock order details
+        const foundOrder = mockOrders.find(o => o.id === orderId);
+        if (foundOrder) {
+            setOrder(foundOrder);
+        } else {
+            toast({ variant: "destructive", title: "Error", description: "Order not found." });
+        }
+        setLoading(false);
+
+    }, [orderId, toast]);
 
     useEffect(() => {
-        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-    }, [messages])
+        if (!orderId) return;
+
+        const messagesCollection = collection(db, 'negotiations', orderId, 'messages');
+        const q = query(messagesCollection, orderBy('timestamp', 'asc'));
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const msgs: Message[] = [];
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                msgs.push({
+                    id: doc.id,
+                    sender: data.sender,
+                    text: data.text,
+                    timestamp: data.timestamp,
+                });
+            });
+            setMessages(msgs);
+        }, (error) => {
+            console.error("Error fetching messages:", error);
+            toast({ variant: "destructive", title: "Error", description: "Could not load chat history." });
+        });
+
+        return () => unsubscribe();
+    }, [orderId, toast]);
 
 
-    const handleSendMessage = () => {
-        if (newMessage.trim() === "") return
-        const currentMessages = [...messages, { sender: 'farmer' as 'farmer', text: newMessage }]
-        setMessages(currentMessages)
-        setNewMessage("")
+    useEffect(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }, [messages]);
 
-        // Simulate buyer response
-        setTimeout(() => {
-            setMessages([...currentMessages, { sender: 'buyer', text: "Let me check with my team." }])
-        }, 1500)
+
+    const handleSendMessage = async () => {
+        if (newMessage.trim() === "" || !orderId || !user) return;
+        setIsSending(true);
+        const messagesCollection = collection(db, 'negotiations', orderId, 'messages');
+        
+        try {
+            await addDoc(messagesCollection, {
+                text: newMessage,
+                sender: user.role, // Assuming the logged in user is the sender
+                timestamp: serverTimestamp(),
+            });
+            setNewMessage("");
+        } catch (error) {
+            console.error("Error sending message:", error);
+            toast({ variant: "destructive", title: "Error", description: "Message could not be sent." });
+        } finally {
+            setIsSending(false);
+        }
     }
 
     if (loading) {
@@ -78,7 +119,7 @@ function NegotiateContent() {
             <DashboardCard title="Loading Negotiation..." description="Please wait...">
                 <Skeleton className="h-96 w-full" />
             </DashboardCard>
-        )
+        );
     }
     
     if (!order) {
@@ -88,7 +129,7 @@ function NegotiateContent() {
                     <Button variant="outline"><ArrowLeft className="mr-2 h-4 w-4" />Back to Orders</Button>
                 </Link>
             </DashboardCard>
-        )
+        );
     }
 
     return (
@@ -99,8 +140,8 @@ function NegotiateContent() {
             <div className="flex flex-col h-[65vh]">
                 <div className="flex-grow overflow-y-auto p-4 border rounded-t-lg bg-muted/20 space-y-4">
                     {messages.map((msg, index) => (
-                        <div key={index} className={`flex items-end gap-2 ${msg.sender === 'farmer' ? 'justify-end' : 'justify-start'}`}>
-                            <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${msg.sender === 'farmer' ? 'bg-primary text-primary-foreground' : 'bg-background'}`}>
+                        <div key={msg.id || index} className={`flex items-end gap-2 ${msg.sender === user?.role ? 'justify-end' : 'justify-start'}`}>
+                            <div className={`max-w-xs lg:max-w-md p-3 rounded-lg ${msg.sender === user?.role ? 'bg-primary text-primary-foreground' : 'bg-background'}`}>
                                 <p className="text-sm">{msg.text}</p>
                             </div>
                         </div>
@@ -114,8 +155,9 @@ function NegotiateContent() {
                             value={newMessage}
                             onChange={(e) => setNewMessage(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                            disabled={isSending}
                         />
-                        <Button onClick={handleSendMessage}>
+                        <Button onClick={handleSendMessage} disabled={isSending}>
                             <Send className="h-4 w-4" />
                             <span className="sr-only">Send</span>
                         </Button>
@@ -128,7 +170,7 @@ function NegotiateContent() {
                 </div>
             </div>
         </DashboardCard>
-    )
+    );
 }
 
 export default function FarmerNegotiatePage() {
@@ -136,5 +178,5 @@ export default function FarmerNegotiatePage() {
         <Suspense fallback={<DashboardCard title="Loading..."><Skeleton className="h-96 w-full" /></DashboardCard>}>
             <NegotiateContent />
         </Suspense>
-    )
+    );
 }
