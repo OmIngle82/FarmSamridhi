@@ -2,6 +2,7 @@
 "use client"
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import {
@@ -89,9 +90,11 @@ export default function RetailerDashboard() {
                         <Plus className="mr-1 h-4 w-4" /> Buy
                         </Button>
                     </div>
-                    <Button variant="outline" size="sm" className="w-full mt-2" onClick={() => showToast('Trace Origin', `Tracing origin for ${product.name}...`)}>
+                    <Button variant="outline" size="sm" className="w-full mt-2" asChild>
+                        <Link href={`/journey?productId=${product.id}`}>
                             <PackageSearch className="mr-2 h-4 w-4" /> Trace Origin
-                        </Button>
+                        </Link>
+                    </Button>
                     </div>
                 </div>
             ))}

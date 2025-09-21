@@ -20,6 +20,7 @@ import {
   User,
   QrCode,
   MessageSquare,
+  Milestone,
 } from "lucide-react"
 
 import {
@@ -57,6 +58,7 @@ const navConfig = {
     retailer: [
         { name: "Dashboard", href: "/retailer", icon: Home },
         { name: "Source Products", href: "/retailer", icon: ShoppingCart }, // Changed to point to main dashboard for now
+        { name: "Trace Journey", href: "/journey", icon: Milestone },
         { name: "My Inventory", href: "/retailer", icon: Store }, // Changed to point to main dashboard for now
         { name: "Transactions", href: "/retailer", icon: Wallet }, // Changed to point to main dashboard for now
     ],
@@ -81,8 +83,9 @@ export function SidebarNav() {
     // Fallback for when user role is not yet available or invalid
     if (pathname.startsWith("/farmer")) return navConfig.farmer
     if (pathname.startsWith("/distributor")) return navConfig.distributor
-    if (pathname.startsWith("/retailer")) return nav-config.retailer
+    if (pathname.startsWith("/retailer")) return navConfig.retailer
     if (pathname.startsWith("/consumer")) return navConfig.consumer
+    if (pathname.startsWith("/journey")) return navConfig.retailer
     return [];
   }
 

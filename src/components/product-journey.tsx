@@ -1,3 +1,4 @@
+
 "use client"
 
 import Image from "next/image"
@@ -18,9 +19,10 @@ const iconMap: { [key: string]: React.ReactNode } = {
 type ProductJourneyProps = {
     journeyData: ProductJourneyData;
     onReset: () => void;
+    resetText?: string;
 }
 
-export function ProductJourney({ journeyData, onReset }: ProductJourneyProps) {
+export function ProductJourney({ journeyData, onReset, resetText = "Scan Another" }: ProductJourneyProps) {
     const { product, farmer, journey } = journeyData;
 
     return (
@@ -39,7 +41,7 @@ export function ProductJourney({ journeyData, onReset }: ProductJourneyProps) {
                     </div>
                      <Button onClick={onReset} variant="outline">
                         <ArrowLeft className="mr-2 h-4 w-4"/>
-                        Scan Another
+                        {resetText}
                     </Button>
                 </div>
 
