@@ -16,9 +16,10 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
 import { getFarmerData, type FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
+import { useEffect } from "react"
 
 const farmers = [
   { name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", phone: "9876543210" },
@@ -34,28 +35,25 @@ const inventory = [
 
 export default function DistributorDashboard() {
   const { toast } = useToast()
-  const [orders, setOrders] = useState<FarmerData['orders'] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: orders, isLoading: loading, error } = useQuery({
+      queryKey: ['orders'],
+      queryFn: async () => {
+          const data = await getFarmerData({ farmerId: "FARM001" });
+          return data.orders;
+      }
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" }) // Using FARM001 as a placeholder for all orders
-        setOrders(data.orders)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch orders:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load orders.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
 
 
   const showToast = (title: string, description: string) => {

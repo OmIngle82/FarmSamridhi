@@ -7,40 +7,37 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, Download, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
-import type { FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 
 export default function FarmerFinancesPage() {
   const { toast } = useToast()
-  const [payments, setPayments] = useState<FarmerData['payments'] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: payments, isLoading: loading, error } = useQuery({
+    queryKey: ['payments'],
+    queryFn: async () => {
+      const data = await getFarmerData({ farmerId: "FARM001" });
+      return data.payments;
+    }
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" })
-        setPayments(data.payments)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch payments:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load financial data.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
+
 
   const totalIncome = payments?.reduce((acc, p) => acc + p.amount, 0) || 0
 

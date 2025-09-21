@@ -14,7 +14,6 @@ import { DashboardCard } from "@/components/dashboard-card"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -36,6 +35,7 @@ import { useToast } from "@/hooks/use-toast"
 import { addProduct, getProducts, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Upload, X, Trash2, Edit } from "lucide-react"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 const productSchema = z.object({
   id: z.string().optional(),
@@ -51,10 +51,65 @@ type ProductFormData = z.infer<typeof productSchema>
 export default function FarmerProductsPage() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
-  const [products, setProducts] = useState<Product[]>([])
-  const [loading, setLoading] = useState(true)
+  const queryClient = useQueryClient()
+  
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+
+  const { data: products = [], isLoading: loading, error } = useQuery<Product[]>({
+      queryKey: ['products'],
+      queryFn: () => getProducts({ farmerId: "FARM001" })
+  });
+
+  useEffect(() => {
+    if (error) {
+        console.error("Failed to fetch products:", error)
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Could not load products.",
+        })
+    }
+  }, [error, toast]);
+
+  const addProductMutation = useMutation({
+    mutationFn: (newProduct: Omit<ProductFormData, 'id'>) => addProduct({ farmerId: "FARM001", ...newProduct }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({ title: "Success", description: "Product added successfully." });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Failed to add product:", error)
+      toast({ variant: "destructive", title: "Error", description: "Could not add product." });
+    },
+  });
+
+  const updateProductMutation = useMutation({
+    mutationFn: (updatedProduct: Product) => updateProduct(updatedProduct),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({ title: "Success", description: "Product updated successfully." });
+      resetForm();
+    },
+    onError: (error) => {
+      console.error("Failed to update product:", error);
+      toast({ variant: "destructive", title: "Error", description: "Could not update product." });
+    },
+  });
+
+  const deleteProductMutation = useMutation({
+    mutationFn: (productId: string) => deleteProduct({ productId }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast({ title: "Success", description: "Product deleted successfully." });
+    },
+    onError: (error) => {
+      console.error("Failed to delete product:", error);
+      toast({ variant: "destructive", title: "Error", description: "Could not delete product." });
+    },
+  });
+
 
   const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
@@ -78,26 +133,6 @@ export default function FarmerProductsPage() {
     }
   }, [searchParams, form, toast]);
 
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        setLoading(true)
-        const fetchedProducts = await getProducts({ farmerId: "FARM001" })
-        setProducts(fetchedProducts)
-      } catch (error) {
-        console.error("Failed to fetch products:", error)
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Could not load products.",
-        })
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchProducts()
-  }, [toast])
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -131,53 +166,16 @@ export default function FarmerProductsPage() {
     setIsEditing(true);
   }
   
-  const handleDeleteClick = async (productId: string) => {
-     try {
-      await deleteProduct({ productId });
-      setProducts(products.filter((p) => p.id !== productId));
-      toast({
-        title: "Success",
-        description: "Product deleted successfully.",
-      });
-    } catch (error) {
-      console.error("Failed to delete product:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Could not delete product.",
-      });
-    }
+  const handleDeleteClick = (productId: string) => {
+     deleteProductMutation.mutate(productId);
   }
 
 
-  const onSubmit: SubmitHandler<ProductFormData> = async (data) => {
-    try {
-      if (isEditing) {
-        const updated = await updateProduct(data as Product)
-        setProducts(products.map(p => p.id === updated.id ? updated : p))
-        toast({
-            title: "Success",
-            description: "Product updated successfully.",
-        })
-      } else {
-        const newProduct = await addProduct({
-            farmerId: "FARM001",
-            ...data,
-        })
-        setProducts((prev) => [...prev, newProduct])
-        toast({
-            title: "Success",
-            description: "Product added successfully.",
-        })
-      }
-      resetForm()
-    } catch (error) {
-      console.error("Failed to save product:", error)
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: `Could not ${isEditing ? 'update' : 'add'} product.`,
-      })
+  const onSubmit: SubmitHandler<ProductFormData> = (data) => {
+    if (isEditing) {
+      updateProductMutation.mutate(data as Product);
+    } else {
+      addProductMutation.mutate(data);
     }
   }
 
@@ -364,7 +362,7 @@ export default function FarmerProductsPage() {
                             </AlertDialogHeader>
                             <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={() => handleDeleteClick(product.id)}>Delete</AlertDialogAction>
+                            <AlertDialogAction onClick={() => handleDeleteClick(product.id!)}>Delete</AlertDialogAction>
                             </AlertDialogFooter>
                         </AlertDialogContent>
                     </AlertDialog>

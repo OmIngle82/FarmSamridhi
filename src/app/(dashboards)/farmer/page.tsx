@@ -30,10 +30,10 @@ import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
 import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
-import type { FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 
 const chartConfig = {
   price: {
@@ -48,35 +48,23 @@ const chartConfig = {
 
 export default function FarmerDashboard() {
   const { toast } = useToast()
-  const [farmerData, setFarmerData] = useState<FarmerData | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: farmerData, isLoading: loading, error } = useQuery({
+      queryKey: ['farmerData'],
+      queryFn: () => getFarmerData({ farmerId: "FARM001" })
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" })
-        setFarmerData(data)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch farmer data:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load farmer dashboard data.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
 
-  const showToast = (title: string, description: string) => {
-    toast({
-        title,
-        description,
-    });
-  };
 
   if (loading) {
     return (
@@ -185,7 +173,7 @@ export default function FarmerDashboard() {
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id} onClick={() => showToast('View Payment', `Viewing details for payment ${payment.id}`)} className="cursor-pointer">
+              <TableRow key={payment.id} onClick={() => toast({title: 'View Payment', description:`Viewing details for payment ${payment.id}`})} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.from}</TableCell>
                 <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
                 <TableCell className="text-right">{payment.date}</TableCell>
@@ -224,7 +212,7 @@ export default function FarmerDashboard() {
       >
         <div className="flex flex-col h-full justify-between">
             <p className="text-muted-foreground mb-4">Get quick and easy access to microloans from our partner institutions with competitive interest rates.</p>
-            <Button className="w-full mt-auto" onClick={() => showToast('Loan Application', 'Redirecting to loan application portal...')}>
+            <Button className="w-full mt-auto" onClick={() => toast({title: 'Loan Application', description: 'Redirecting to loan application portal...'})}>
                 <DollarSign className="mr-2 h-4 w-4" />
                 Apply for a Loan
             </Button>
@@ -242,7 +230,7 @@ export default function FarmerDashboard() {
                     <AccordionContent>
                         <p className="mb-2">{scheme.description}</p>
                         <p><strong className="font-medium">Eligibility: </strong>{scheme.eligibility}</p>
-                        <Button variant="link" className="px-0 h-auto mt-2" onClick={() => showToast('Learn More', `Opening details for ${scheme.name}`)}>Learn More</Button>
+                        <Button variant="link" className="px-0 h-auto mt-2" onClick={() => toast({title: 'Learn More', description: `Opening details for ${scheme.name}`})}>Learn More</Button>
                     </AccordionContent>
                 </AccordionItem>
             ))}

@@ -8,35 +8,33 @@ import {
 import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
-import type { FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 
 export default function FarmerSchemesPage() {
   const { toast } = useToast()
-  const [schemes, setSchemes] = useState<FarmerData['schemes'] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: schemes, isLoading: loading, error } = useQuery({
+    queryKey: ['schemes'],
+    queryFn: async () => {
+      const data = await getFarmerData({ farmerId: "FARM001" });
+      return data.schemes;
+    }
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" })
-        setSchemes(data.schemes)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch schemes:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load government schemes.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
+
 
   const showToast = (title: string, description: string) => {
     toast({

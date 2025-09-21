@@ -14,9 +14,10 @@ import {
 import { DashboardCard } from "@/components/dashboard-card"
 import { PackageSearch, Plus, Tractor } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
-import { getProducts, type Product, getFarmerData, type FarmerData } from "@/ai/flows/farmer-flow"
+import { useEffect } from "react"
+import { getProducts, type Product } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from '@tanstack/react-query'
 
 const transactions = [
     { id: "TRN001", date: "2024-07-21", item: "Fresh Tomatoes", amount: "₹5,000", status: "Completed" },
@@ -26,28 +27,22 @@ const transactions = [
 
 export default function RetailerDashboard() {
   const { toast } = useToast()
-  const [products, setProducts] = useState<Product[] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: products, isLoading: loading, error } = useQuery({
+    queryKey: ['allProducts'],
+    queryFn: () => getProducts({ farmerId: "FARM001" })
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getProducts({ farmerId: "FARM001" }) // Using FARM001 as a placeholder for all products
-        setProducts(data)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch products:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load products.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
 
 
   const showToast = (title: string, description: string) => {

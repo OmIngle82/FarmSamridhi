@@ -3,8 +3,6 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -19,14 +17,37 @@ import { useToast } from "@/hooks/use-toast"
 import { getProductJourney, type ProductJourneyData } from '@/ai/flows/journey-flow'
 import { ProductJourney } from '@/components/product-journey'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useQuery } from '@tanstack/react-query'
 
 export default function ConsumerDashboard() {
   const { toast } = useToast()
   const [isScanning, setIsScanning] = useState(false)
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null)
   const [journeyData, setJourneyData] = useState<ProductJourneyData | null>(null)
-  const [isFetchingJourney, setIsFetchingJourney] = useState(false)
+  const [startFetching, setStartFetching] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  const { data: fetchedJourneyData, isFetching: isFetchingJourney, error } = useQuery({
+    queryKey: ['productJourney', 'PROD001'],
+    queryFn: () => getProductJourney({ productId: "PROD001" }),
+    enabled: startFetching,
+  });
+
+  useEffect(() => {
+    if (fetchedJourneyData) {
+      setJourneyData(fetchedJourneyData);
+      setStartFetching(false);
+    }
+    if (error) {
+      console.error("Failed to fetch journey data:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Could not load product journey.",
+      });
+      setStartFetching(false);
+    }
+  }, [fetchedJourneyData, error, toast]);
 
   useEffect(() => {
     if (isScanning) {
@@ -62,23 +83,10 @@ export default function ConsumerDashboard() {
     }
   }, [isScanning, toast]);
 
-  const handleSimulateScan = async () => {
+  const handleSimulateScan = () => {
     setIsScanning(false)
-    setIsFetchingJourney(true)
     setJourneyData(null)
-    try {
-        const data = await getProductJourney({ productId: "PROD001" })
-        setJourneyData(data)
-    } catch(error) {
-        console.error("Failed to fetch journey data:", error)
-        toast({
-            variant: "destructive",
-            title: "Error",
-            description: "Could not load product journey.",
-        })
-    } finally {
-        setIsFetchingJourney(false)
-    }
+    setStartFetching(true);
   }
 
   const handleStartScan = () => {

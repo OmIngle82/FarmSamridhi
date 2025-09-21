@@ -13,42 +13,33 @@ import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { Phone } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
-import type { FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 
 export default function FarmerOrdersPage() {
   const { toast } = useToast()
-  const [orders, setOrders] = useState<FarmerData['orders'] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: orders, isLoading: loading, error } = useQuery({
+      queryKey: ['farmerOrders'],
+      queryFn: async () => {
+          const data = await getFarmerData({ farmerId: "FARM001" });
+          return data.orders;
+      }
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" })
-        setOrders(data.orders)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch orders:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load orders.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
 
-  const showToast = (title: string, description: string) => {
-    toast({
-        title,
-        description,
-    });
-  };
 
   return (
     <DashboardCard

@@ -12,10 +12,10 @@ import type { ChartConfig } from "@/components/ui/chart"
 import { ChartContainer, ChartTooltipContent, ChartLegendContent } from "@/components/ui/chart"
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
-import type { FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 
 const chartConfig = {
   price: {
@@ -30,28 +30,26 @@ const chartConfig = {
 
 export default function FarmerMarketPage() {
   const { toast } = useToast()
-  const [marketPrices, setMarketPrices] = useState<FarmerData['marketPrices'] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: marketPrices, isLoading: loading, error } = useQuery({
+    queryKey: ['marketPrices'],
+    queryFn: async () => {
+        const data = await getFarmerData({ farmerId: "FARM001" });
+        return data.marketPrices;
+    }
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" })
-        setMarketPrices(data.marketPrices)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch market prices:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load market prices.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
+
 
   return (
     <DashboardCard

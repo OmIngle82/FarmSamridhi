@@ -9,42 +9,33 @@ import {
 } from "@/components/ui/table"
 import { DashboardCard } from "@/components/dashboard-card"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
-import type { FarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useQuery } from "@tanstack/react-query"
 
 export default function FarmerPaymentsPage() {
   const { toast } = useToast()
-  const [payments, setPayments] = useState<FarmerData['payments'] | null>(null)
-  const [loading, setLoading] = useState(true)
+
+  const { data: payments, isLoading: loading, error } = useQuery({
+    queryKey: ['farmerPayments'],
+    queryFn: async () => {
+      const data = await getFarmerData({ farmerId: "FARM001" });
+      return data.payments;
+    }
+  });
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const data = await getFarmerData({ farmerId: "FARM001" })
-        setPayments(data.payments)
-      } catch (error) {
+    if (error) {
         console.error("Failed to fetch payments:", error)
         toast({
           variant: "destructive",
           title: "Error",
           description: "Could not load payments.",
         })
-      } finally {
-        setLoading(false)
-      }
     }
-    fetchData()
-  }, [toast])
+  }, [error, toast]);
 
-  const showToast = (title: string, description: string) => {
-    toast({
-        title,
-        description,
-    });
-  };
 
   return (
     <DashboardCard
@@ -67,7 +58,7 @@ export default function FarmerPaymentsPage() {
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id} onClick={() => showToast('View Payment', `Viewing details for payment ${payment.id}`)} className="cursor-pointer">
+              <TableRow key={payment.id} onClick={() => toast({title: 'View Payment', description: `Viewing details for payment ${payment.id}`})} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.id}</TableCell>
                 <TableCell>{payment.from}</TableCell>
                 <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
