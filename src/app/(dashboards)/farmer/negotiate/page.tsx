@@ -4,20 +4,12 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
-import { type Order } from '@/ai/flows/farmer-flow'
+import { type Order, getFarmerData } from '@/ai/flows/farmer-flow'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardCard } from '@/components/dashboard-card'
 import { NegotiationChat } from '@/components/negotiation-chat'
 import { useI18n } from '@/contexts/i18n-context'
-
-
-// Mock order data - in a real app, this would be fetched from your database
-const mockOrders: Order[] = [
-    { id: "ORD001", customer: "BigBasket", amount: 12500, status: "Pending", phone: "9123456780" },
-    { id: "ORD002", customer: "Local Mandi", amount: 8200, status: "Shipped", phone: "9123456781" },
-    { id: "ORD003", customer: "Reliance Fresh", amount: 25000, status: "Pending", phone: "9123456782" },
-];
-
+import { useQuery } from '@tanstack/react-query'
 
 function NegotiateContent() {
     const { t } = useI18n();
@@ -25,26 +17,18 @@ function NegotiateContent() {
     const { toast } = useToast();
     const orderId = searchParams.get('orderId');
     
-    const [order, setOrder] = useState<Order | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { data: order, isLoading: loading, error } = useQuery({
+        queryKey: ['farmerData', 'order', orderId],
+        queryFn: () => getFarmerData({ farmerId: "FARM001" }), // Assuming one farmer for now
+        enabled: !!orderId,
+        select: (data) => data.orders.find(o => o.id === orderId),
+    });
 
     useEffect(() => {
-        if (!orderId) {
-            setLoading(false);
-            toast({ variant: "destructive", title: t('error'), description: t('noOrderIdProvided') });
-            return;
-        }
-
-        // Fetch mock order details
-        const foundOrder = mockOrders.find(o => o.id === orderId);
-        if (foundOrder) {
-            setOrder(foundOrder);
-        } else {
+        if (error) {
             toast({ variant: "destructive", title: t('error'), description: t('orderNotFound') });
         }
-        setLoading(false);
-
-    }, [orderId, toast, t]);
+    }, [error, toast, t]);
     
     if (!order && !loading) {
         return null;
@@ -52,7 +36,7 @@ function NegotiateContent() {
 
     return (
        <NegotiationChat
-            order={order}
+            order={order || null}
             isLoading={loading}
             backLinkHref="/farmer/orders"
             backLinkText={t('backToOrders')}
