@@ -1,7 +1,8 @@
 
 "use client"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useSearchParams, usePathname, useRouter } from "next/navigation"
+import React, { useEffect, useMemo } from "react"
 import {
   Table,
   TableBody,
@@ -15,14 +16,16 @@ import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { MessageSquare, Phone } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { useEffect, useMemo } from "react"
 import { getFarmerData, type Order } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 function OrdersContent() {
   const { toast } = useToast()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
+  const router = useRouter()
 
   const { data: allOrders, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
@@ -30,15 +33,13 @@ function OrdersContent() {
       select: (data) => data.orders,
   });
 
+  const statusFilter = searchParams.get('status') || 'all';
+
   const orders = useMemo(() => {
     if (!allOrders) return [];
-    const filter = searchParams.get('filter');
-    const status = searchParams.get('status');
-    if (filter === 'orders' && status) {
-        return allOrders.filter(o => o.status.toLowerCase() === status.toLowerCase());
-    }
-    return allOrders;
-  }, [allOrders, searchParams]);
+    if (statusFilter === 'all') return allOrders;
+    return allOrders.filter(o => o.status.toLowerCase() === statusFilter.toLowerCase());
+  }, [allOrders, statusFilter]);
 
   useEffect(() => {
     if (error) {
@@ -51,16 +52,33 @@ function OrdersContent() {
     }
   }, [error, toast]);
 
+  const handleTabChange = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (value === 'all') {
+        params.delete('status');
+    } else {
+        params.set('status', value);
+    }
+    router.replace(`${pathname}?${params.toString()}`);
+  }
+
 
   return (
     <DashboardCard
       title="All Orders"
       description="A complete history of all your orders."
     >
+        <Tabs value={statusFilter} onValueChange={handleTabChange} className="mb-4">
+            <TabsList>
+                <TabsTrigger value="all">All Orders</TabsTrigger>
+                <TabsTrigger value="pending">Pending</TabsTrigger>
+                <TabsTrigger value="shipped">Shipped</TabsTrigger>
+            </TabsList>
+        </Tabs>
       {loading ? (
         <Skeleton className="h-60 w-full" />
       ) : !orders || orders.length === 0 ? (
-        <div className="text-center text-muted-foreground py-12">No orders found.</div>
+        <div className="text-center text-muted-foreground py-12">No {statusFilter !== 'all' ? statusFilter : ''} orders found.</div>
       ) : (
         <Table>
           <TableHeader>
