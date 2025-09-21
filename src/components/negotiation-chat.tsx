@@ -153,4 +153,3 @@ export function NegotiationChat({ order, isLoading, backLinkHref, backLinkText, 
         </DashboardCard>
     );
 }
-
