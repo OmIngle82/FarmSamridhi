@@ -2,7 +2,7 @@
 "use client"
 import Link from "next/link"
 import { useSearchParams, usePathname, useRouter } from "next/navigation"
-import React, { useEffect, useMemo } from "react"
+import React, { useEffect, useMemo, Suspense } from "react"
 import {
   Table,
   TableBody,
@@ -72,7 +72,7 @@ function OrdersContent() {
     >
         <Tabs value={statusFilter} onValueChange={handleTabChange} className="mb-4">
             <TabsList>
-                <TabsTrigger value="all">{t('allOrders')}</TabsTrigger>
+                <TabsTrigger value="all">{t('all')}</TabsTrigger>
                 <TabsTrigger value="pending">{t('pending')}</TabsTrigger>
                 <TabsTrigger value="shipped">{t('shipped')}</TabsTrigger>
             </TabsList>
@@ -124,6 +124,8 @@ function OrdersContent() {
 
 export default function FarmerOrdersPage() {
     return (
-        <OrdersContent />
+        <Suspense>
+            <OrdersContent />
+        </Suspense>
     )
 }

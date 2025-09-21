@@ -30,6 +30,7 @@ export const translations = {
     price: "Price",
     no: "No",
     of: "of",
+    all: "All",
     
     // Landing Page
     loginSignUp: "Login / Sign Up",
@@ -140,6 +141,7 @@ agriLoanExpress: "Agri-Loan Express",
     allOrders: "All Orders",
     completeOrderHistory: "A complete history of all your orders.",
     ordersError: "Could not load orders.",
+    ordersFound: "orders found",
     
     // Farmer > Payments
     allPayments: "All Payments",
@@ -358,6 +360,7 @@ agriLoanExpress: "Agri-Loan Express",
     price: "कीमत",
     no: "नहीं",
     of: "का",
+    all: "सभी",
 
     // Landing Page
     loginSignUp: "लॉगिन / साइन अप",
@@ -468,6 +471,7 @@ agriLoanExpress: "Agri-Loan Express",
     allOrders: "सभी ऑर्डर",
     completeOrderHistory: "आपके सभी आदेशों का एक पूरा इतिहास।",
     ordersError: "ऑर्डर लोड नहीं किए जा सके।",
+    ordersFound: "ऑर्डर मिले",
     
     // Farmer > Payments
     allPayments: "सभी भुगतान",
@@ -550,7 +554,7 @@ agriLoanExpress: "Agri-Loan Express",
     inventoryTracking: "इन्वेंटरी ट्रैकिंग",
     monitorStockLevels: "अपने वर्तमान स्टॉक स्तरों की निगरानी करें।",
     distributorDataError: "वितरक डेटा लोड नहीं किया जा सका।",
-    noFarmersFound: "कोई किसान نہیں मिला।",
+    noFarmersFound: "कोई किसान नहीं मिला।",
     noOrdersFound: "कोई आदेश नहीं मिला।",
     noInventoryData: "कोई इन्वेंट्री डेटा नहीं मिला।",
     inStock: "स्टॉक में",
@@ -686,6 +690,7 @@ negotiatingOrder: "मोलभाव ऑर्डर",
     price: "किंमत",
     no: "नाही",
     of: "चे",
+    all: "सर्व",
 
     // Landing Page
     loginSignUp: "लॉगिन / साइन अप",
@@ -793,9 +798,10 @@ negotiatingOrder: "मोलभाव ऑर्डर",
     suggestionFailedDescription: "AI सूचना तयार करू शकलो नाही. कृपया तपशील मॅन्युअली भरा.",
 
     // Farmer > Orders
-    allOrders: "सर्व ऑર્ડर्स",
+    allOrders: "सर्व ऑर्डर्स",
     completeOrderHistory: "तुमच्या सर्व ऑर्डरचा संपूर्ण इतिहास.",
     ordersError: "ऑर्डर्स लोड करू शकलो नाही.",
+    ordersFound: "ऑर्डर्स आढळल्या",
     
     // Farmer > Payments
     allPayments: "सर्व पेमेंट्स",
