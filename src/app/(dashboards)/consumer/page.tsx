@@ -1,3 +1,4 @@
+
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
@@ -23,21 +24,17 @@ export default function ConsumerDashboard() {
   const { toast } = useToast()
   const [isScanning, setIsScanning] = useState(false)
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null)
-  const [journeyData, setJourneyData] = useState<ProductJourneyData | null>(null)
-  const [startFetching, setStartFetching] = useState(false)
+  const [scannedProductId, setScannedProductId] = useState<string | null>(null);
+  
   const videoRef = useRef<HTMLVideoElement>(null)
 
-  const { data: fetchedJourneyData, isFetching: isFetchingJourney, error } = useQuery({
-    queryKey: ['productJourney', 'PROD001'],
-    queryFn: () => getProductJourney({ productId: "PROD001" }),
-    enabled: startFetching,
+  const { data: journeyData, isFetching: isFetchingJourney, error, isSuccess } = useQuery({
+    queryKey: ['productJourney', scannedProductId],
+    queryFn: () => getProductJourney({ productId: scannedProductId! }),
+    enabled: !!scannedProductId,
   });
 
   useEffect(() => {
-    if (fetchedJourneyData) {
-      setJourneyData(fetchedJourneyData);
-      setStartFetching(false);
-    }
     if (error) {
       console.error("Failed to fetch journey data:", error);
       toast({
@@ -45,15 +42,17 @@ export default function ConsumerDashboard() {
         title: "Error",
         description: "Could not load product journey.",
       });
-      setStartFetching(false);
+      setScannedProductId(null);
     }
-  }, [fetchedJourneyData, error, toast]);
+  }, [error, toast]);
 
   useEffect(() => {
+    let stream: MediaStream | null = null;
+    
     if (isScanning) {
       const getCameraPermission = async () => {
         try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
           setHasCameraPermission(true);
 
           if (videoRef.current) {
@@ -75,8 +74,7 @@ export default function ConsumerDashboard() {
       
       return () => {
         // Stop camera stream when component unmounts or scanning stops
-        if (videoRef.current && videoRef.current.srcObject) {
-            const stream = videoRef.current.srcObject as MediaStream;
+        if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
       }
@@ -85,23 +83,22 @@ export default function ConsumerDashboard() {
 
   const handleSimulateScan = () => {
     setIsScanning(false)
-    setJourneyData(null)
-    setStartFetching(true);
+    setScannedProductId("PROD001");
   }
 
   const handleStartScan = () => {
-    setJourneyData(null)
+    setScannedProductId(null);
     setIsScanning(true)
   }
 
   const handleCloseScanner = () => {
     setIsScanning(false);
-    if (videoRef.current && videoRef.current.srcObject) {
-        const stream = videoRef.current.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
-    }
   }
   
+  const resetJourney = () => {
+    setScannedProductId(null);
+  }
+
   if (isFetchingJourney) {
     return (
       <DashboardCard title="Tracing Product Journey..." description="Fetching the story of your food from farm to table.">
@@ -114,9 +111,9 @@ export default function ConsumerDashboard() {
     )
   }
 
-  if (journeyData) {
+  if (journeyData && isSuccess) {
     return (
-        <ProductJourney journeyData={journeyData} onReset={() => setJourneyData(null)} />
+        <ProductJourney journeyData={journeyData} onReset={resetJourney} />
     )
   }
 
@@ -178,3 +175,5 @@ export default function ConsumerDashboard() {
     </>
   )
 }
+
+    
