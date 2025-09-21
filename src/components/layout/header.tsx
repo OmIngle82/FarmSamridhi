@@ -36,13 +36,20 @@ import { placeholderImages } from "@/lib/placeholder-images"
 import { useToast } from "@/hooks/use-toast"
 import Link from "next/link"
 import { VoiceCommandDialog } from "@/components/voice-command-dialog"
+import { useAuth } from "@/contexts/auth-context"
 
 
 export function Header() {
   const router = useRouter()
+  const { user, logout } = useAuth()
   const userAvatar = placeholderImages.find(p => p.id === 'avatar-1');
   const { toast } = useToast()
   const [isVoiceDialogOpen, setIsVoiceDialogOpen] = useState(false);
+
+  const handleLogout = () => {
+    logout();
+    router.push('/');
+  }
 
   return (
     <header className="sticky top-0 z-10 flex h-16 w-full items-center gap-4 border-b bg-background px-4 md:px-6">
@@ -95,18 +102,18 @@ export function Header() {
             <Button variant="ghost" className="relative h-8 w-8 rounded-full">
               <Avatar className="h-8 w-8">
                 {userAvatar && (
-                    <AvatarImage src={userAvatar.imageUrl} alt="User Avatar" data-ai-hint={userAvatar.imageHint} />
+                    <AvatarImage src={userAvatar.imageUrl} alt={user?.name} data-ai-hint={userAvatar.imageHint} />
                 )}
-                <AvatarFallback>U</AvatarFallback>
+                <AvatarFallback>{user?.name?.charAt(0) || 'U'}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">Ramesh Kumar</p>
+                <p className="text-sm font-medium leading-none">{user?.name}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  ramesh.k@example.com
+                  {user?.email}
                 </p>
               </div>
             </DropdownMenuLabel>
@@ -124,11 +131,9 @@ export function Header() {
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-             <DropdownMenuItem asChild>
-                <Link href="/">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Log out</span>
-                </Link>
+             <DropdownMenuItem onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Log out</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
