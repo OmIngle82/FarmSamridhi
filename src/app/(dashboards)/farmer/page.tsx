@@ -1,3 +1,4 @@
+
 "use client"
 import Link from "next/link"
 import {
@@ -173,7 +174,7 @@ export default function FarmerDashboard() {
           </TableHeader>
           <TableBody>
             {payments.map((payment) => (
-              <TableRow key={payment.id} onClick={() => toast({title: 'View Payment', description:`Viewing details for payment ${payment.id}`})} className="cursor-pointer">
+              <TableRow key={payment.id} onClick={() => toast({title: 'View Details (Demo)', description:'In a real app, this would open a detailed view for the payment.'})} className="cursor-pointer">
                 <TableCell className="font-medium">{payment.from}</TableCell>
                 <TableCell>₹{payment.amount.toLocaleString()}</TableCell>
                 <TableCell className="text-right">{payment.date}</TableCell>

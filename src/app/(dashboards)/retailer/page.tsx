@@ -86,7 +86,7 @@ export default function RetailerDashboard() {
                     <p className="text-sm text-muted-foreground">from Suresh Patel</p>
                     <div className="flex justify-between items-center mt-4">
                         <span className="font-bold text-lg">₹{product.price}/kg</span>
-                        <Button size="sm" onClick={() => showToast('Product Added', `${product.name} added to your cart.`)}>
+                        <Button size="sm" onClick={() => showToast('Purchase (Demo)', `In a real app, this would add ${product.name} to your cart.`)}>
                         <Plus className="mr-1 h-4 w-4" /> Buy
                         </Button>
                     </div>
@@ -120,7 +120,7 @@ export default function RetailerDashboard() {
           </TableHeader>
           <TableBody>
             {transactions.map((transaction) => (
-              <TableRow key={transaction.id} onClick={() => showToast('View Transaction', `Viewing details for transaction ${transaction.id}`)} className="cursor-pointer">
+              <TableRow key={transaction.id} onClick={() => showToast('View Details (Demo)', 'In a real app, this would open a detailed view for the transaction.')} className="cursor-pointer">
                 <TableCell className="font-medium">{transaction.id}</TableCell>
                 <TableCell>{transaction.date}</TableCell>
                 <TableCell>{transaction.item}</TableCell>
