@@ -57,7 +57,7 @@ export default function FarmerSchemesPage() {
                         <p className="mb-2">{scheme.description}</p>
                         <p><strong className="font-medium">Eligibility: </strong>{scheme.eligibility}</p>
                         <Button variant="link" className="px-0 h-auto mt-2" asChild>
-                           <Link href="#" target="_blank" rel="noopener noreferrer">Learn More</Link>
+                           <Link href={`https://www.google.com/search?q=${encodeURIComponent(scheme.name)}`} target="_blank" rel="noopener noreferrer">Learn More</Link>
                         </Button>
                     </AccordionContent>
                 </AccordionItem>
