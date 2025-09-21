@@ -1,3 +1,5 @@
+
+"use client"
 import {
   Accordion,
   AccordionContent,
@@ -20,7 +22,7 @@ import {
   CartesianGrid,
   XAxis,
   YAxis,
-  Tooltip as ChartTooltip,
+  Tooltip,
 } from "recharts"
 import type { ChartConfig } from "@/components/ui/chart"
 import { ChartContainer, ChartTooltipContent } from "@/components/ui/chart"
@@ -169,7 +171,7 @@ export default function FarmerDashboard() {
               tickFormatter={(value) => value.slice(0, 3)}
             />
              <YAxis />
-            <ChartTooltip content={<ChartTooltipContent />} />
+            <Tooltip content={<ChartTooltipContent />} />
             <Bar dataKey="price" fill="var(--color-price)" radius={4} />
             <Bar dataKey="target" fill="var(--color-target)" radius={4} />
           </BarChart>
