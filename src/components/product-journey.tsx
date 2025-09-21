@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { DashboardCard } from "@/components/dashboard-card"
 import type { ProductJourneyData } from "@/ai/flows/journey-flow"
-import { Seedling, Wheat, Truck, Warehouse, Store, ArrowLeft } from "lucide-react"
+import { Sprout, Wheat, Truck, Warehouse, Store, ArrowLeft } from "lucide-react"
 
 const iconMap = {
-    seeding: <Seedling className="h-6 w-6 text-primary" />,
+    seeding: <Sprout className="h-6 w-6 text-primary" />,
     harvest: <Wheat className="h-6 w-6 text-primary" />,
     transit: <Truck className="h-6 w-6 text-primary" />,
     warehouse: <Warehouse className="h-6 w-6 text-primary" />,
