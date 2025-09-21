@@ -38,10 +38,25 @@ import { useToast } from "@/hooks/use-toast"
 import { getFarmerData } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { CalendarIcon } from "lucide-react"
+import { Calendar } from "@/components/ui/calendar"
+import { format } from "date-fns"
+import { cn } from "@/lib/utils"
+
 
 export default function FarmerFinancesPage() {
   const { toast } = useToast()
   const [isLoanDialogOpen, setIsLoanDialogOpen] = useState(false)
+  const [isExpenseSheetOpen, setIsExpenseSheetOpen] = useState(false)
+  const [expenseDate, setExpenseDate] = useState<Date>()
 
   const { data: farmerData, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
@@ -70,6 +85,15 @@ export default function FarmerFinancesPage() {
     toast({
         title: "Loan Application Submitted",
         description: "Your application has been received and is under review."
+    });
+  }
+  
+  const handleExpenseSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsExpenseSheetOpen(false);
+    toast({
+        title: "Expense Added",
+        description: "Your expense has been successfully recorded."
     });
   }
 
@@ -104,7 +128,7 @@ export default function FarmerFinancesPage() {
                 <Button onClick={() => setIsLoanDialogOpen(true)}>
                     <DollarSign className="mr-2 h-4 w-4" /> Apply for Loan
                 </Button>
-                <Button variant="outline" onClick={() => showToast('Add Expense', 'Feature coming soon!')}>
+                <Button variant="outline" onClick={() => setIsExpenseSheetOpen(true)}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Add Expense
                 </Button>
                 <Button variant="outline" onClick={() => showToast('Download Report', 'Feature coming soon!')}>
@@ -178,6 +202,72 @@ export default function FarmerFinancesPage() {
             </form>
         </DialogContent>
     </Dialog>
+    
+    <Sheet open={isExpenseSheetOpen} onOpenChange={setIsExpenseSheetOpen}>
+        <SheetContent>
+            <SheetHeader>
+                <SheetTitle>Add a New Expense</SheetTitle>
+                <SheetDescription>
+                    Keep track of your farm's expenses to better manage your finances.
+                </SheetDescription>
+            </SheetHeader>
+            <form onSubmit={handleExpenseSubmit}>
+                <div className="grid gap-4 py-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="expense-category">Category</Label>
+                        <Select required>
+                            <SelectTrigger id="expense-category">
+                                <SelectValue placeholder="Select a category" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="seeds">Seeds</SelectItem>
+                                <SelectItem value="fertilizer">Fertilizer</SelectItem>
+                                <SelectItem value="pesticides">Pesticides</SelectItem>
+                                <SelectItem value="labor">Labor</SelectItem>
+                                <SelectItem value="equipment">Equipment</SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="expense-amount">Amount (₹)</Label>
+                        <Input id="expense-amount" type="number" placeholder="5000" required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="expense-date">Date of Expense</Label>
+                        <Popover>
+                            <PopoverTrigger asChild>
+                                <Button
+                                variant={"outline"}
+                                className={cn(
+                                    "w-full justify-start text-left font-normal",
+                                    !expenseDate && "text-muted-foreground"
+                                )}
+                                >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {expenseDate ? format(expenseDate, "PPP") : <span>Pick a date</span>}
+                                </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0">
+                                <Calendar
+                                mode="single"
+                                selected={expenseDate}
+                                onSelect={setExpenseDate}
+                                initialFocus
+                                />
+                            </PopoverContent>
+                        </Popover>
+                    </div>
+                </div>
+                <SheetFooter>
+                    <SheetClose asChild>
+                        <Button type="button" variant="secondary">Cancel</Button>
+                    </SheetClose>
+                    <Button type="submit">Save Expense</Button>
+                </SheetFooter>
+            </form>
+        </SheetContent>
+    </Sheet>
     </>
   )
 }
