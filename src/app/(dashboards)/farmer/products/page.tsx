@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, Suspense } from "react"
+import { useState, useEffect, Suspense, useRef } from "react"
 import Image from "next/image"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -33,8 +33,9 @@ import {
 
 import { useToast } from "@/hooks/use-toast"
 import { addProduct, getProducts, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
+import { suggestProductDetails } from "@/ai/flows/suggest-product-details-flow"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Upload, X, Trash2, Edit } from "lucide-react"
+import { Upload, X, Trash2, Edit, Sparkles } from "lucide-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 
 const productSchema = z.object({
@@ -55,6 +56,8 @@ function ProductsPageContent() {
   
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [isEditing, setIsEditing] = useState(false)
+  const [isSuggesting, setIsSuggesting] = useState(false);
+  const suggestionAppliedRef = useRef(false);
 
   const { data: products = [], isLoading: loading, error } = useQuery<Product[]>({
       queryKey: ['products'],
@@ -123,13 +126,39 @@ function ProductsPageContent() {
   })
   
   useEffect(() => {
-    const newProductName = searchParams.get("newProductName")
-    if (newProductName) {
-      form.setValue("name", newProductName)
-      toast({
-        title: "Add New Product",
-        description: `Please fill in the details for "${newProductName}".`,
-      });
+    const newProductName = searchParams.get("newProductName");
+    if (newProductName && !suggestionAppliedRef.current) {
+        suggestionAppliedRef.current = true; // Prevents re-running on component re-renders
+        form.setValue("name", newProductName);
+        toast({
+            title: "Add New Product",
+            description: `Generating suggestions for "${newProductName}"...`,
+        });
+
+        const getSuggestions = async () => {
+            setIsSuggesting(true);
+            try {
+                const suggestions = await suggestProductDetails({ productName: newProductName });
+                form.setValue("description", suggestions.description);
+                form.setValue("image", suggestions.imageUrl);
+                setImagePreview(suggestions.imageUrl);
+                toast({
+                    title: "Suggestions Applied!",
+                    description: "We've filled in a description and image for you.",
+                });
+            } catch (err) {
+                console.error("Failed to get suggestions:", err);
+                toast({
+                    variant: "destructive",
+                    title: "Suggestion Failed",
+                    description: "Could not generate AI suggestions. Please fill in the details manually.",
+                });
+            } finally {
+                setIsSuggesting(false);
+            }
+        };
+
+        getSuggestions();
     }
   }, [searchParams, form, toast]);
 
@@ -158,6 +187,7 @@ function ProductsPageContent() {
     form.reset()
     removeImage()
     setIsEditing(false)
+    suggestionAppliedRef.current = false;
   }
 
   const handleEditClick = (product: Product) => {
@@ -221,13 +251,21 @@ function ProductsPageContent() {
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full h-32 border-dashed"
+                  className="w-full h-32 border-dashed flex flex-col items-center justify-center"
                   onClick={() => document.getElementById('image-upload')?.click()}
+                  disabled={isSuggesting}
                 >
-                  <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                    <Upload className="h-8 w-8" />
-                    <span>Upload Image</span>
-                  </div>
+                  {isSuggesting ? (
+                    <>
+                      <Sparkles className="h-8 w-8 animate-pulse text-primary" />
+                      <span className="text-muted-foreground mt-2">Generating image...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-8 w-8 text-muted-foreground" />
+                      <span className="text-muted-foreground mt-2">Upload Image</span>
+                    </>
+                  )}
                 </Button>
               )}
             </div>
@@ -250,11 +288,15 @@ function ProductsPageContent() {
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <div className="flex justify-between items-center">
+                    <FormLabel>Description</FormLabel>
+                     {isSuggesting && <span className="text-xs text-muted-foreground">Generating...</span>}
+                  </div>
                   <FormControl>
                     <Textarea
                       placeholder="e.g. Organically grown, hand-picked tomatoes from our farm."
                       {...field}
+                      disabled={isSuggesting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -295,7 +337,7 @@ function ProductsPageContent() {
                         Cancel
                     </Button>
                 )}
-                <Button type="submit" className="w-full" disabled={addProductMutation.isPending || updateProductMutation.isPending}>
+                <Button type="submit" className="w-full" disabled={addProductMutation.isPending || updateProductMutation.isPending || isSuggesting}>
                 {addProductMutation.isPending ? "Adding..." : updateProductMutation.isPending ? "Saving..." : isEditing ? "Save Changes" : "Add Product"}
                 </Button>
             </div>
