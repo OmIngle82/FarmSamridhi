@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
 import { getFarmerData } from '@/app/actions/ai-actions'
+import type { Purchase } from '@/ai/flows/farmer-flow'
 
 import { DashboardCard } from '@/components/dashboard-card'
 import { Button } from '@/components/ui/button'
@@ -30,7 +31,7 @@ export default function MyPurchasesPage() {
   const { data: purchases, isLoading, error } = useQuery({
       queryKey: ['consumerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }), // Placeholder ID
-      select: (data) => data.purchases,
+      select: (data): Purchase[] => data.purchases,
   });
 
   useEffect(() => {

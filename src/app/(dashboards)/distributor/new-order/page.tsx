@@ -15,7 +15,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData, addOrder, type Product, type FarmerProfile } from "@/app/actions/ai-actions"
+import { getFarmerData, addOrder } from "@/app/actions/ai-actions"
+import type { Product, FarmerProfile } from "@/ai/flows/farmer-flow"
 import {
   Form,
   FormControl,
@@ -63,7 +64,7 @@ export default function NewOrderPage() {
   const { data, isLoading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }), // Using FARM001 as a placeholder
-      select: (data) => ({ products: data.products, farmers: data.farmers })
+      select: (data) => ({ products: data.products as Product[], farmers: data.farmers as FarmerProfile[] })
   });
   
   const products = data?.products || [];

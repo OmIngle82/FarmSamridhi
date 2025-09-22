@@ -9,7 +9,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { useToast } from "@/hooks/use-toast"
-import { type Order } from "@/app/actions/ai-actions"
+import type { Order } from "@/ai/flows/farmer-flow"
 import { Skeleton } from '@/components/ui/skeleton'
 import { ArrowLeft, Send, Loader2 } from 'lucide-react'
 import { db } from '@/lib/firebase';

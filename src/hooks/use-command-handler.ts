@@ -3,7 +3,7 @@
 
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { type VoiceCommandOutput } from "@/app/actions/ai-actions";
+import type { VoiceCommandOutput } from "@/ai/flows/voice-command-flow";
 import { useI18n } from "@/contexts/i18n-context";
 
 export function useCommandHandler(onCommandHandled?: () => void) {

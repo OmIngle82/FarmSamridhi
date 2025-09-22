@@ -19,32 +19,17 @@ export {
     applyForLoan,
 } from '@/ai/flows/farmer-flow';
 
-export type {
-    Product,
-    Order,
-    Payment,
-    MarketPrice,
-    Scheme,
-    InventoryItem,
-    FarmerProfile,
-    Expense,
-    LoanApplication,
-    Purchase,
-    FavoriteFarmer,
-    FarmerData,
-} from '@/ai/flows/farmer-flow';
+// Type exports have been removed from this file.
+// Components should import types directly from their source flow files.
+// e.g., import type { Product } from '@/ai/flows/farmer-flow';
+
 
 export { getProductJourney } from '@/ai/flows/journey-flow';
-export type { ProductJourneyData } from '@/ai/flows/journey-flow';
 
 export { diagnosePlant } from '@/ai/flows/diagnose-plant-flow';
-export type { DiagnosePlantInput, DiagnosePlantOutput } from '@/ai/flows/diagnose-plant-flow';
 
 export { suggestProductDetails } from '@/ai/flows/suggest-product-details-flow';
-export type { SuggestProductDetailsInput, SuggestProductDetailsOutput } from '@/ai/flows/suggest-product-details-flow';
 
 export { handleVoiceCommand } from '@/ai/flows/voice-command-flow';
-export type { VoiceCommandInput, VoiceCommandOutput } from '@/ai/flows/voice-command-flow';
 
 export { getAudioVisualization } from '@/ai/flows/get-audio-visualization-flow';
-export type { AudioVisualizationInput, AudioVisualizationOutput } from '@/ai/flows/get-audio-visualization-flow';

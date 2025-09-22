@@ -18,6 +18,7 @@ import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { getFarmerData } from "@/app/actions/ai-actions"
+import type { Order, InventoryItem, FarmerProfile } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect } from "react"
@@ -32,7 +33,7 @@ export default function DistributorDashboard() {
   const { data, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }),
-      select: (data) => ({ orders: data.orders, inventory: data.inventory, farmers: data.farmers })
+      select: (data) => ({ orders: data.orders as Order[], inventory: data.inventory as InventoryItem[], farmers: data.farmers as FarmerProfile[] })
   });
 
   const orders = data?.orders;
