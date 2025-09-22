@@ -14,7 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { diagnosePlant, type DiagnosePlantOutput } from "@/ai/flows/diagnose-plant-flow"
+import { diagnosePlant, type DiagnosePlantOutput } from "@/app/actions/ai-actions"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Upload, X, Sparkles, Wand, Leaf, HeartPulse, BrainCircuit, ShieldCheck, CheckCircle, AlertTriangle } from "lucide-react"
 import { useI18n } from '@/contexts/i18n-context'

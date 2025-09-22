@@ -5,7 +5,7 @@ import { useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useQuery } from '@tanstack/react-query'
-import { getFarmerData } from '@/ai/flows/farmer-flow'
+import { getFarmerData } from '@/app/actions/ai-actions'
 
 import { DashboardCard } from '@/components/dashboard-card'
 import { Button } from '@/components/ui/button'
@@ -92,4 +92,3 @@ export default function FavoriteFarmersPage() {
     </DashboardCard>
   )
 }
-

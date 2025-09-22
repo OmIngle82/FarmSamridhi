@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData, addOrder, type Product, type FarmerProfile } from "@/ai/flows/farmer-flow"
+import { getFarmerData, addOrder, type Product, type FarmerProfile } from "@/app/actions/ai-actions"
 import {
   Form,
   FormControl,

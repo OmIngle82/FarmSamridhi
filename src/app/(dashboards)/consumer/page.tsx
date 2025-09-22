@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button"
 import { DashboardCard } from "@/components/dashboard-card"
 import { QrCode, Camera, ScanLine, X } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { getProductJourney, type ProductJourneyData } from '@/ai/flows/journey-flow'
+import { getProductJourney, type ProductJourneyData } from '@/app/actions/ai-actions'
 import { ProductJourney } from '@/components/product-journey'
 import { Skeleton } from '@/components/ui/skeleton'
 import { useQuery } from '@tanstack/react-query'

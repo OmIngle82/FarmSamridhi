@@ -32,7 +32,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, MessageSquare, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/ai/flows/farmer-flow"
+import { getFarmerData } from "@/app/actions/ai-actions"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
 import { useI18n } from '@/contexts/i18n-context'

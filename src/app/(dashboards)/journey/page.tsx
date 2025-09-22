@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { DashboardCard } from '@/components/dashboard-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
-import { getProductJourney } from '@/ai/flows/journey-flow';
+import { getProductJourney } from '@/app/actions/ai-actions';
 import { ProductJourney } from '@/components/product-journey';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';

@@ -1,10 +1,10 @@
 
 "use client"
 
-import { useState, useEffect, Suspense } from 'react'
+import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
-import { type Order, getFarmerData } from '@/ai/flows/farmer-flow'
+import { type Order, getFarmerData } from '@/app/actions/ai-actions'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardCard } from '@/components/dashboard-card'
 import { NegotiationChat } from '@/components/negotiation-chat'

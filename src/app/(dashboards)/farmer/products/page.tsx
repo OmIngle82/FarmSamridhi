@@ -33,8 +33,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 import { useToast } from "@/hooks/use-toast"
-import { addProduct, getFarmerData, type Product, updateProduct, deleteProduct } from "@/ai/flows/farmer-flow"
-import { suggestProductDetails } from "@/ai/flows/suggest-product-details-flow"
+import { addProduct, getFarmerData, type Product, updateProduct, deleteProduct, suggestProductDetails } from "@/app/actions/ai-actions"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Upload, X, Trash2, Edit, Sparkles, Loader2 } from "lucide-react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
