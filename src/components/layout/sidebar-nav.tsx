@@ -68,8 +68,8 @@ const navConfig = {
     consumer: [
         { key: "dashboard", href: "/consumer", icon: Home },
         { key: "scanProduct", href: "/consumer", icon: QrCode },
-        { key: "myPurchases", href: "/consumer", icon: ShoppingCart },
-        { key: "favoriteFarmers", href: "/consumer", icon: HeartHandshake },
+        { key: "myPurchases", href: "/consumer/purchases", icon: ShoppingCart },
+        { key: "favoriteFarmers", href: "/consumer/farmers", icon: HeartHandshake },
     ]
 };
 

@@ -130,6 +130,25 @@ const ApplyForLoanRequestSchema = z.object({
     purpose: z.string(),
 });
 
+const PurchaseSchema = z.object({
+  id: z.string(),
+  productName: z.string(),
+  productId: z.string(),
+  image: z.string(),
+  date: z.string(),
+  price: z.number(),
+});
+export type Purchase = z.infer<typeof PurchaseSchema>;
+
+const FavoriteFarmerSchema = z.object({
+    id: z.string(),
+    name: z.string(),
+    location: z.string(),
+    avatarId: z.string(),
+    specialty: z.string(),
+});
+export type FavoriteFarmer = z.infer<typeof FavoriteFarmerSchema>;
+
 
 const FarmerDataSchema = z.object({
   products: z.array(ProductSchema),
@@ -139,6 +158,8 @@ const FarmerDataSchema = z.object({
   schemes: z.array(SchemeSchema),
   inventory: z.array(InventoryItemSchema),
   farmers: z.array(FarmerProfileSchema),
+  purchases: z.array(PurchaseSchema),
+  favoriteFarmers: z.array(FavoriteFarmerSchema),
 });
 
 export type FarmerData = z.infer<typeof FarmerDataSchema>;
@@ -197,6 +218,16 @@ const mockFarmers: FarmerProfile[] = [
 
 let mockExpenses: Expense[] = [];
 let mockLoanApplications: LoanApplication[] = [];
+
+const mockPurchases: Purchase[] = [
+    { id: "PUR001", productName: "Organic Tomatoes", productId: "PROD001", image: "https://picsum.photos/seed/prod-tomato/400/300", date: "2024-07-28", price: 60 },
+    { id: "PUR002", productName: "Sonora Wheat", productId: "PROD002", image: "https://picsum.photos/seed/prod-wheat/400/300", date: "2024-07-25", price: 250 },
+];
+
+const mockFavoriteFarmers: FavoriteFarmer[] = [
+    { id: "FARM001", name: "Suresh Patel", location: "Nashik, Maharashtra", avatarId: "avatar-1", specialty: "Organic Vegetables" },
+    { id: "FARM003", name: "Anil Kumar", location: "Moga, Punjab", avatarId: "avatar-3", specialty: "Grains & Pulses" },
+];
 
 
 export async function getFarmerData(
@@ -261,6 +292,8 @@ const getFarmerDataFlow = ai.defineFlow(
       schemes: mockSchemes,
       inventory: mockInventory,
       farmers: mockFarmers,
+      purchases: mockPurchases,
+      favoriteFarmers: mockFavoriteFarmers,
     };
   }
 );

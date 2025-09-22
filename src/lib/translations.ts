@@ -31,6 +31,7 @@ export const translations = {
     no: "No",
     of: "of",
     all: "All",
+    contact: "Contact",
     
     // Landing Page
     loginSignUp: "Login / Sign Up",
@@ -252,6 +253,7 @@ agriLoanExpress: "Agri-Loan Express",
     noInventoryData: "No inventory data found.",
     inStock: "In Stock",
     lowStock: "Low Stock",
+    negotiations: "Negotiations",
 
     // Distributor > New Order
     createNewOrder: "Create a New Order",
@@ -268,6 +270,7 @@ agriLoanExpress: "Agri-Loan Express",
     newOrderSuccess: "New order has been successfully created.",
     newOrderError: "Could not create the new order.",
     newOrderDataError: "Could not load data for creating an order.",
+    newOrder: "New Order",
 
     // Retailer Dashboard
     sourceTraceableProducts: "Source Traceable Products",
@@ -280,6 +283,8 @@ agriLoanExpress: "Agri-Loan Express",
     manageTransactions: "Manage Transactions",
     procurementHistory: "Your recent procurement history.",
     transactionId: "Transaction ID",
+    transactions: "Transactions",
+    sourceProducts: "Source Products",
 
     // Consumer Dashboard
     traceYourFoodJourney: "Trace Your Food's Journey",
@@ -296,6 +301,26 @@ agriLoanExpress: "Agri-Loan Express",
     enableCameraPermissions: "Please enable camera permissions in your browser settings.",
     tracingProductJourney: "Tracing Product Journey...",
     fetchingJourneyDescription: "Fetching the story of your food from farm to table.",
+    scanProduct: "Scan Product",
+
+    // Consumer > Purchases
+    myPurchases: "My Purchases",
+    myPurchasesDescription: "A history of all the products you've purchased.",
+    purchaseDate: "Purchase Date",
+    myPurchasesError: "Could not load your purchase history.",
+    noPurchases: "No Purchases Yet",
+    noPurchasesDescription: "Your purchased items will appear here.",
+    
+    // Consumer > Favorite Farmers
+    favoriteFarmers: "Favorite Farmers",
+    favoriteFarmersDescription: "A list of farmers you've favorited.",
+    favoriteFarmersError: "Could not load your favorite farmers.",
+    noFavoriteFarmers: "No Favorite Farmers Yet",
+    noFavoriteFarmersDescription: "You can favorite farmers from the product journey page.",
+    specialty: "Specialty",
+    viewProducts: "View Products",
+    viewProductsSoon: "You'll be able to view this farmer's products soon.",
+    sendMessageSoon: "You'll be able to send a message to this farmer soon.",
 
     // Journey Page
     noProductSelected: "No Product Selected",
@@ -313,6 +338,7 @@ agriLoanExpress: "Agri-Loan Express",
     transit: "In Transit",
     warehouse: "Warehouse",
     retail: "Available at Retail",
+    traceJourney: "Trace Journey",
     
     // Negotiation Chat
     noOrderIdProvided: "No order ID provided.",
@@ -338,6 +364,7 @@ agriLoanExpress: "Agri-Loan Express",
     send: "Send",
     chatHistoryError: "Could not load chat history.",
     sendMessageError: "Message could not be sent.",
+    inventory: "Inventory",
 
     // Voice Command
     voiceCommand: "Voice Command",
@@ -384,6 +411,7 @@ agriLoanExpress: "Agri-Loan Express",
     no: "नहीं",
     of: "का",
     all: "सभी",
+    contact: "संपर्क",
 
     // Landing Page
     loginSignUp: "लॉगिन / साइन अप",
@@ -604,6 +632,7 @@ agriLoanExpress: "Agri-Loan Express",
     noInventoryData: "कोई इन्वेंट्री डेटा नहीं मिला।",
     inStock: "स्टॉक में",
     lowStock: "कम स्टॉक",
+    negotiations: "मोलभाव",
 
     // Distributor > New Order
     createNewOrder: "नया ऑर्डर बनाएं",
@@ -620,6 +649,7 @@ agriLoanExpress: "Agri-Loan Express",
     newOrderSuccess: "नया ऑर्डर सफलतापूर्वक बनाया गया है।",
     newOrderError: "नया ऑर्डर नहीं बनाया जा सका।",
     newOrderDataError: "ऑर्डर बनाने के लिए डेटा लोड नहीं किया जा सका।",
+    newOrder: "नया ऑर्डर",
 
     // Retailer Dashboard
     sourceTraceableProducts: "पता लगाने योग्य उत्पाद खरीदें",
@@ -632,6 +662,8 @@ agriLoanExpress: "Agri-Loan Express",
     manageTransactions: "लेन-देन प्रबंधित करें",
     procurementHistory: "आपका हालिया खरीद इतिहास।",
     transactionId: "लेन-देन ID",
+    transactions: "लेनदेन",
+    sourceProducts: "स्रोत उत्पाद",
 
     // Consumer Dashboard
     traceYourFoodJourney: "अपने भोजन की यात्रा का पता लगाएं",
@@ -648,6 +680,27 @@ agriLoanExpress: "Agri-Loan Express",
     enableCameraPermissions: "कृपया अपने ब्राउज़र सेटिंग्स में कैमरा अनुमतियाँ सक्षम करें।",
     tracingProductJourney: "उत्पाद यात्रा का पता लगा रहा है...",
     fetchingJourneyDescription: "खेत से मेज तक आपके भोजन की कहानी प्राप्त कर रहा है।",
+    scanProduct: "उत्पाद स्कैन करें",
+
+    // Consumer > Purchases
+    myPurchases: "मेरी खरीद",
+    myPurchasesDescription: "आपके द्वारा खरीदे गए सभी उत्पादों का इतिहास।",
+    purchaseDate: "खरीद की तारीख",
+    myPurchasesError: "आपका खरीद इतिहास लोड नहीं किया जा सका।",
+    noPurchases: "अभी तक कोई खरीद नहीं",
+    noPurchasesDescription: "आपके खरीदे गए आइटम यहां दिखाई देंगे।",
+
+    // Consumer > Favorite Farmers
+    favoriteFarmers: "पसंदीदा किसान",
+    favoriteFarmersDescription: "आपके द्वारा पसंदीदा किसानों की सूची।",
+    favoriteFarmersError: "आपके पसंदीदा किसानों को लोड नहीं किया जा सका।",
+    noFavoriteFarmers: "अभी तक कोई पसंदीदा किसान नहीं",
+    noFavoriteFarmersDescription: "आप उत्पाद यात्रा पृष्ठ से किसानों को पसंदीदा बना सकते हैं।",
+    specialty: "विशेषता",
+    viewProducts: "उत्पाद देखें",
+    viewProductsSoon: "आप जल्द ही इस किसान के उत्पाद देख पाएंगे।",
+    sendMessageSoon: "आप जल्द ही इस किसान को संदेश भेज पाएंगे।",
+
 
     // Journey Page
     noProductSelected: "कोई उत्पाद नहीं चुना गया",
@@ -665,6 +718,7 @@ agriLoanExpress: "Agri-Loan Express",
     transit: "पारगमन में",
     warehouse: "गोदाम",
     retail: "खुदरा पर उपलब्ध",
+    traceJourney: "यात्रा ट्रेस करें",
     
     // Negotiation Chat
     noOrderIdProvided: "कोई ऑर्डर ID प्रदान नहीं किया गया।",
@@ -683,13 +737,14 @@ agriLoanExpress: "Agri-Loan Express",
     loadingNegotiation: "मोलभाव लोड हो रहा है...",
     pleaseWait: "कृपया प्रतीक्षा करें...",
     orderNotFoundDescription: "अनुरोधित ऑर्डर नहीं मिला।",
-negotiatingOrder: "मोलभाव ऑर्डर",
+    negotiatingOrder: "मोलभाव ऑर्डर",
     noMessagesYet: "अभी तक कोई संदेश नहीं। बातचीत शुरू करें!",
     acceptOffer: "प्रस्ताव स्वीकार करें",
     typeYourMessage: "अपना संदेश टाइप करें...",
     send: " भेजें",
     chatHistoryError: "चैट इतिहास लोड नहीं किया जा सका।",
     sendMessageError: "संदेश नहीं भेजा जा सका।",
+    inventory: "इन्वेंटरी",
 
     // Voice Command
     voiceCommand: "वॉयस कमांड",
@@ -713,7 +768,7 @@ negotiatingOrder: "मोलभाव ऑर्डर",
     logout: "लॉग आउट",
     support: "समर्थन",
     dashboard: "डॅशबोर्ड",
-    orders: "ऑર્ડर्स",
+    orders: "ऑर्डर्स",
     payments: "पेमेंट्स",
     loading: "लोड होत आहे",
     error: "त्रुटी",
@@ -736,6 +791,7 @@ negotiatingOrder: "मोलभाव ऑर्डर",
     no: "नाही",
     of: "चे",
     all: "सर्व",
+    contact: "संपर्क",
 
     // Landing Page
     loginSignUp: "लॉगिन / साइन अप",
@@ -832,7 +888,7 @@ negotiatingOrder: "मोलभाव ऑर्डर",
     deleteProductWarning: "ही क्रिया पूर्ववत केली जाऊ शकत नाही. हे उत्पादन \"{productName}\" कायमचे हटवेल.",
     productsError: "उत्पादने लोड करू शकलो नाही.",
     productAddedSuccess: "उत्पादन यशस्वीरित्या जोडले.",
-    addProductError: "उत्पादन ਜੋडू शकलो नाही.",
+    addProductError: "उत्पादन జోडू शकलो नाही.",
     productUpdatedSuccess: "उत्पादन यशस्वीरित्या अपडेट केले.",
     updateProductError: "उत्पादन अपडेट करू शकलो नाही.",
     productDeletedSuccess: "उत्पादन यशस्वीरित्या हटवले.",
@@ -854,7 +910,7 @@ negotiatingOrder: "मोलभाव ऑर्डर",
     completePaymentHistory: "तुमच्या सर्व प्राप्त पेमेंट्सचा संपूर्ण इतिहास.",
     paymentId: "पेमेंट आयडी",
     paymentsError: "पेमेंट्स लोड करू शकलो नाही.",
-noPaymentsFound: "कोणतेही पेमेंट आढळले नाही.",
+    noPaymentsFound: "कोणतेही पेमेंट आढळले नाही.",
     viewDetailsDemoTitle: "तपशील पहा (डेमो)",
     viewDetailsDemoDescription: "वास्तविक अॅपमध्ये, हे पेमेंटसाठी तपशीलवार दृश्य उघडेल.",
 
@@ -956,6 +1012,7 @@ noPaymentsFound: "कोणतेही पेमेंट आढळले न�
     noInventoryData: "कोणताही इन्व्हेंटरी डेटा आढळला नाही.",
     inStock: "स्टॉकमध्ये",
     lowStock: "कमी स्टॉक",
+    negotiations: "वाटाघाटी",
 
     // Distributor > New Order
     createNewOrder: "नवीन ऑर्डर तयार करा",
@@ -972,6 +1029,7 @@ noPaymentsFound: "कोणतेही पेमेंट आढळले न�
     newOrderSuccess: "नवीन ऑर्डर यशस्वीरित्या तयार केली आहे.",
     newOrderError: "नवीन ऑर्डर तयार करू शकलो नाही.",
     newOrderDataError: "ऑर्डर तयार करण्यासाठी डेटा लोड करू शकलो नाही.",
+    newOrder: "नवीन ऑर्डर",
 
     // Retailer Dashboard
     sourceTraceableProducts: "शोधण्यायोग्य उत्पादने मिळवा",
@@ -984,6 +1042,8 @@ noPaymentsFound: "कोणतेही पेमेंट आढळले न�
     manageTransactions: "व्यवहार व्यवस्थापित करा",
     procurementHistory: "तुमचा अलीकडील खरेदी इतिहास.",
     transactionId: "व्यवहार आयडी",
+    transactions: "व्यवहार",
+    sourceProducts: "स्रोत उत्पादने",
 
     // Consumer Dashboard
     traceYourFoodJourney: "तुमच्या अन्नाच्या प्रवासाचा मागोवा घ्या",
@@ -1000,6 +1060,26 @@ noPaymentsFound: "कोणतेही पेमेंट आढळले न�
     enableCameraPermissions: "कृपया तुमच्या ब्राउझर सेटिंग्जमध्ये कॅमेरा परवानग्या सक्षम करा.",
     tracingProductJourney: "उत्पादनाच्या प्रवासाचा मागोवा घेत आहे...",
     fetchingJourneyDescription: "तुमच्या अन्नाची कहाणी शेतापासून ताटापर्यंत मिळवत आहे.",
+    scanProduct: "उत्पादन স্ক্যান करा",
+
+    // Consumer > Purchases
+    myPurchases: "माझ्या खरेदी",
+    myPurchasesDescription: "तुम्ही खरेदी केलेल्या सर्व उत्पादनांचा इतिहास.",
+    purchaseDate: "खरेदीची तारीख",
+    myPurchasesError: "तुमचा खरेदी इतिहास लोड करू शकलो नाही.",
+    noPurchases: "अद्याप कोणतीही खरेदी नाही",
+    noPurchasesDescription: "तुम्ही खरेदी केलेले आयटम येथे दिसतील.",
+
+    // Consumer > Favorite Farmers
+    favoriteFarmers: "आवडते शेतकरी",
+    favoriteFarmersDescription: "तुम्ही आवडते म्हणून निवडलेल्या शेतकऱ्यांची यादी.",
+    favoriteFarmersError: "तुमचे आवडते शेतकरी लोड करू शकलो नाही.",
+    noFavoriteFarmers: "अद्याप कोणतेही आवडते शेतकरी नाहीत",
+    noFavoriteFarmersDescription: "तुम्ही उत्पादन प्रवास पृष्ठावरून शेतकऱ्यांना आवडते म्हणून निवडू शकता.",
+    specialty: "विशेषता",
+    viewProducts: "उत्पादने पहा",
+    viewProductsSoon: "तुम्ही लवकरच या शेतकऱ्याची उत्पादने पाहू शकाल.",
+    sendMessageSoon: "तुम्ही लवकरच या शेतकऱ्याला संदेश पाठवू शकाल.",
 
     // Journey Page
     noProductSelected: "कोणतेही उत्पादन निवडलेले नाही",
@@ -1017,6 +1097,7 @@ noPaymentsFound: "कोणतेही पेमेंट आढळले न�
     transit: "परिवହनात",
     warehouse: "गोदाम",
     retail: "किरकोळ विक्रीसाठी उपलब्ध",
+    traceJourney: "प्रवास ट्रेस करा",
     
     // Negotiation Chat
     noOrderIdProvided: "कोणताही ऑर्डर आयडी प्रदान केलेला नाही.",
@@ -1042,6 +1123,7 @@ noPaymentsFound: "कोणतेही पेमेंट आढळले न�
     send: "पाठवा",
     chatHistoryError: "चॅट इतिहास लोड करू शकलो नाही.",
     sendMessageError: "संदेश पाठवू शकलो नाही.",
+    inventory: "इन्व्हेंटरी",
 
     // Voice Command
     voiceCommand: "व्हॉइस कमांड",
