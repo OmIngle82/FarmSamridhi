@@ -2,7 +2,6 @@
 "use client"
 
 import { useState, useEffect, useRef } from 'react'
-import jsQR from "jsqr"
 import {
   AlertDialog,
   AlertDialogContent,
@@ -26,13 +25,8 @@ export default function ConsumerDashboard() {
   const { t } = useI18n();
   const { toast } = useToast()
   const [isScanning, setIsScanning] = useState(false)
-  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null)
   const [scannedProductId, setScannedProductId] = useState<string | null>(null);
   
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-  const streamRef = useRef<MediaStream | null>(null);
-
   const { data: journeyData, isFetching: isFetchingJourney, error, isSuccess } = useQuery({
     queryKey: ['productJourney', scannedProductId],
     queryFn: () => getProductJourney({ productId: scannedProductId! }),
@@ -51,87 +45,6 @@ export default function ConsumerDashboard() {
     }
   }, [error, toast]);
   
-  const stopCamera = () => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-  }
-
-  useEffect(() => {
-    let animationFrameId: number | null = null;
-
-    const tick = () => {
-       if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA && canvasRef.current) {
-        const video = videoRef.current;
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-
-        if (ctx) {
-          canvas.height = video.videoHeight;
-          canvas.width = video.videoWidth;
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          try {
-            const code = jsQR(imageData.data, imageData.width, imageData.height, {
-              inversionAttempts: "dontInvert",
-            });
-
-            if (code) {
-              console.log("Found QR code", code.data);
-              setScannedProductId(code.data);
-              handleCloseScanner();
-            }
-          } catch (e) {
-            console.error("jsQR error:", e);
-          }
-        }
-      }
-      // Check isScanning inside the loop to ensure it stops promptly
-      if (isScanning) {
-        animationFrameId = requestAnimationFrame(tick);
-      }
-    };
-    
-    if (isScanning) {
-      const getCameraPermission = async () => {
-        try {
-          const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-          streamRef.current = stream;
-          setHasCameraPermission(true);
-
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-            // The 'loadeddata' event is a good place to start the animation loop
-            videoRef.current.onloadeddata = () => {
-              animationFrameId = requestAnimationFrame(tick);
-            };
-          }
-        } catch (error) {
-          console.error('Error accessing camera:', error);
-          setHasCameraPermission(false);
-          toast({
-            variant: 'destructive',
-            title: t('cameraAccessDenied'),
-            description: t('enableCameraPermissions'),
-          });
-          setIsScanning(false)
-        }
-      };
-
-      getCameraPermission();
-    } else {
-        stopCamera();
-    }
-    
-    return () => {
-      stopCamera();
-      if (animationFrameId) {
-          cancelAnimationFrame(animationFrameId);
-      }
-    }
-  }, [isScanning, toast, t]);
-
 
   const handleSimulateScan = () => {
     setIsScanning(false)
@@ -139,7 +52,8 @@ export default function ConsumerDashboard() {
   }
 
   const handleStartScan = () => {
-    setScannedProductId(null);
+    // In a real app, this would open the camera. For this simplified version,
+    // we'll show a dialog explaining the feature is simulated.
     setIsScanning(true)
   }
 
@@ -193,29 +107,23 @@ export default function ConsumerDashboard() {
       </DashboardCard>
       
       <AlertDialog open={isScanning} onOpenChange={setIsScanning}>
-        <AlertDialogContent className="max-w-2xl">
+        <AlertDialogContent className="max-w-lg">
           <AlertDialogHeader>
             <AlertDialogTitle>{t('scanProductQrCode')}</AlertDialogTitle>
             <AlertDialogDescription>
               {t('centerQrCode')}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="relative w-full aspect-video bg-muted rounded-md overflow-hidden">
-             <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-             <canvas ref={canvasRef} className="hidden" />
-             <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative w-full aspect-video bg-muted rounded-md overflow-hidden flex items-center justify-center">
+            <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-64 h-64 border-4 border-white/50 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.5)]"/>
              </div>
-             {hasCameraPermission === false && (
-                <div className="absolute inset-0 bg-background/80 flex items-center justify-center">
-                    <Alert variant="destructive" className="w-3/4">
-                        <AlertTitle>{t('cameraAccessRequired')}</AlertTitle>
-                        <AlertDescription>
-                           {t('allowCameraAccess')}
-                        </AlertDescription>
-                    </Alert>
-                </div>
-             )}
+            <Alert variant="default" className="w-3/4 bg-background">
+                <AlertTitle>Live Scanning Not Implemented</AlertTitle>
+                <AlertDescription>
+                    The live QR code scanning feature is not implemented in this prototype to ensure compatibility. Please use the &quot;Simulate Scan&quot; button on the dashboard to see the product journey feature.
+                </AlertDescription>
+            </Alert>
           </div>
           <AlertDialogFooter>
             <Button variant="outline" onClick={handleCloseScanner}>
