@@ -33,12 +33,12 @@ export default function DistributorDashboard() {
   const { data, isLoading: loading, error } = useQuery({
       queryKey: ['farmerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }),
-      select: (data) => ({ orders: data.orders as Order[], inventory: data.inventory as InventoryItem[], farmers: data.farmers as FarmerProfile[] })
+      select: (data) => ({ orders: data.orders, inventory: data.inventory, farmers: data.farmers })
   });
 
-  const orders = data?.orders;
-  const inventory = data?.inventory;
-  const farmers = data?.farmers;
+  const orders = data?.orders as Order[] | undefined;
+  const inventory = data?.inventory as InventoryItem[] | undefined;
+  const farmers = data?.farmers as FarmerProfile[] | undefined;
 
   useEffect(() => {
     if (error) {

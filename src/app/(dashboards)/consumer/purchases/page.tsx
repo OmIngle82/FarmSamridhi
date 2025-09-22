@@ -31,7 +31,7 @@ export default function MyPurchasesPage() {
   const { data: purchases, isLoading, error } = useQuery({
       queryKey: ['consumerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }), // Placeholder ID
-      select: (data): Purchase[] => data.purchases,
+      select: (data) => data.purchases,
   });
 
   useEffect(() => {

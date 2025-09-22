@@ -25,7 +25,7 @@ export default function FavoriteFarmersPage() {
   const { data: favoriteFarmers, isLoading, error } = useQuery({
       queryKey: ['consumerData'],
       queryFn: () => getFarmerData({ farmerId: "FARM001" }), // Placeholder ID
-      select: (data): FavoriteFarmer[] => data.favoriteFarmers,
+      select: (data) => data.favoriteFarmers,
   });
 
   useEffect(() => {

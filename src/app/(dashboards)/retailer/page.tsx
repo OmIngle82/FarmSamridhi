@@ -36,7 +36,7 @@ export default function RetailerDashboard() {
   const { data: products, isLoading: loading, error } = useQuery({
     queryKey: ['farmerData'],
     queryFn: () => getFarmerData({ farmerId: "FARM001" }),
-    select: (data) => data.products,
+    select: (data) => data.products as Product[],
   });
 
   useEffect(() => {

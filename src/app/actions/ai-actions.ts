@@ -19,7 +19,6 @@ export {
     applyForLoan,
 } from '@/ai/flows/farmer-flow';
 
-// Type exports have been removed from this file.
 // Components should import types directly from their source flow files.
 // e.g., import type { Product } from '@/ai/flows/farmer-flow';
 
