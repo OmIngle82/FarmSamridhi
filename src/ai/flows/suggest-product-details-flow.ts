@@ -6,7 +6,7 @@
  * - SuggestProductDetailsOutput - The return type for the function.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai } from '@/lib/genkit';
 import { z } from 'zod';
 import { generate } from 'genkit';
 

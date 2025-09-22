@@ -7,7 +7,7 @@
  * - DiagnosePlantOutput - The return type for the diagnosePlant function.
  */
 
-import {ai} from '@/ai/genkit';
+import {ai} from '@/lib/genkit';
 import {z} from 'zod';
 
 const DiagnosePlantInputSchema = z.object({

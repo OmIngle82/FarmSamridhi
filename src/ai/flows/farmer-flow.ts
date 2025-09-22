@@ -4,7 +4,7 @@
  * @fileOverview A flow to retrieve all data for the farmer dashboard.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai } from '@/lib/genkit';
 import { z } from 'zod';
 
 const FarmerDataRequestSchema = z.object({

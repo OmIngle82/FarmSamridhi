@@ -3,7 +3,7 @@
  * @fileOverview A flow to retrieve the journey of a product.
  */
 
-import { ai } from '@/ai/genkit';
+import { ai } from '@/lib/genkit';
 import { z } from 'zod';
 
 const ProductJourneyRequestSchema = z.object({

@@ -17,7 +17,7 @@ export {
     deleteProduct,
     addExpense,
     applyForLoan,
-} from '@/app/api/ai/flows/farmer-flow';
+} from '@/ai/flows/farmer-flow';
 
 export type {
     Product,
@@ -32,19 +32,19 @@ export type {
     Purchase,
     FavoriteFarmer,
     FarmerData,
-} from '@/app/api/ai/flows/farmer-flow';
+} from '@/ai/flows/farmer-flow';
 
-export { getProductJourney } from '@/app/api/ai/flows/journey-flow';
-export type { ProductJourneyData } from '@/app/api/ai/flows/journey-flow';
+export { getProductJourney } from '@/ai/flows/journey-flow';
+export type { ProductJourneyData } from '@/ai/flows/journey-flow';
 
-export { diagnosePlant } from '@/app/api/ai/flows/diagnose-plant-flow';
-export type { DiagnosePlantInput, DiagnosePlantOutput } from '@/app/api/ai/flows/diagnose-plant-flow';
+export { diagnosePlant } from '@/ai/flows/diagnose-plant-flow';
+export type { DiagnosePlantInput, DiagnosePlantOutput } from '@/ai/flows/diagnose-plant-flow';
 
-export { suggestProductDetails } from '@/app/api/ai/flows/suggest-product-details-flow';
-export type { SuggestProductDetailsInput, SuggestProductDetailsOutput } from '@/app/api/ai/flows/suggest-product-details-flow';
+export { suggestProductDetails } from '@/ai/flows/suggest-product-details-flow';
+export type { SuggestProductDetailsInput, SuggestProductDetailsOutput } from '@/ai/flows/suggest-product-details-flow';
 
-export { handleVoiceCommand } from '@/app/api/ai/flows/voice-command-flow';
-export type { VoiceCommandInput, VoiceCommandOutput } from '@/app/api/ai/flows/voice-command-flow';
+export { handleVoiceCommand } from '@/ai/flows/voice-command-flow';
+export type { VoiceCommandInput, VoiceCommandOutput } from '@/ai/flows/voice-command-flow';
 
-export { getAudioVisualization } from '@/app/api/ai/flows/get-audio-visualization-flow';
-export type { AudioVisualizationInput, AudioVisualizationOutput } from '@/app/api/ai/flows/get-audio-visualization-flow';
+export { getAudioVisualization } from '@/ai/flows/get-audio-visualization-flow';
+export type { AudioVisualizationInput, AudioVisualizationOutput } from '@/ai/flows/get-audio-visualization-flow';
