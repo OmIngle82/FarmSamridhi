@@ -181,7 +181,7 @@ export default function NewOrderPage() {
                                                         <FormControl>
                                                             <SelectTrigger>
                                                                 <SelectValue placeholder={t('selectProduct')} />
-                                                            </Trigger>
+                                                            </SelectTrigger>
                                                         </FormControl>
                                                         <SelectContent>
                                                             {products.map(product => (
@@ -245,3 +245,5 @@ export default function NewOrderPage() {
     </DashboardCard>
   )
 }
+
+    
