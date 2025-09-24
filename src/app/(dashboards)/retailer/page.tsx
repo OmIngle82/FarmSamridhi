@@ -17,8 +17,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { PackageSearch, Plus, Tractor } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { useEffect } from "react"
-import { getFarmerData } from "@/app/actions/ai-actions"
-import type { Product } from "@/ai/flows/farmer-flow"
+import { getFarmerData, type Product } from '@/ai/flows/farmer-flow'
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from '@tanstack/react-query'
 import { useI18n } from '@/contexts/i18n-context'
@@ -36,7 +35,7 @@ export default function RetailerDashboard() {
   const { data: products, isLoading: loading, error } = useQuery({
     queryKey: ['farmerData'],
     queryFn: () => getFarmerData({ farmerId: "FARM001" }),
-    select: (data) => data.products as Product[],
+    select: (data) => data.products,
   });
 
   useEffect(() => {

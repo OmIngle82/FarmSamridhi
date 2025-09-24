@@ -17,7 +17,7 @@ import { DashboardCard } from "@/components/dashboard-card"
 import { placeholderImages } from "@/lib/placeholder-images"
 import { MessageCircle, Phone, PlusCircle } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData } from "@/app/actions/ai-actions"
+import { getFarmerData } from "@/ai/flows/farmer-flow"
 import type { Order, InventoryItem, FarmerProfile } from "@/ai/flows/farmer-flow"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery } from "@tanstack/react-query"
@@ -36,9 +36,9 @@ export default function DistributorDashboard() {
       select: (data) => ({ orders: data.orders, inventory: data.inventory, farmers: data.farmers })
   });
 
-  const orders = data?.orders as Order[] | undefined;
-  const inventory = data?.inventory as InventoryItem[] | undefined;
-  const farmers = data?.farmers as FarmerProfile[] | undefined;
+  const orders = data?.orders;
+  const inventory = data?.inventory;
+  const farmers = data?.farmers;
 
   useEffect(() => {
     if (error) {

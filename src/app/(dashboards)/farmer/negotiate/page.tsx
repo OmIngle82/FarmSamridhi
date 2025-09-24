@@ -4,8 +4,7 @@
 import { useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData } from '@/app/actions/ai-actions'
-import type { Order } from '@/ai/flows/farmer-flow'
+import { getFarmerData, type Order } from '@/ai/flows/farmer-flow'
 import { Skeleton } from '@/components/ui/skeleton'
 import { DashboardCard } from '@/components/dashboard-card'
 import { NegotiationChat } from '@/components/negotiation-chat'

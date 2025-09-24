@@ -46,7 +46,7 @@ import {
 import { DashboardCard } from "@/components/dashboard-card"
 import { DollarSign, Download, PlusCircle, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
-import { getFarmerData, addExpense, applyForLoan } from "@/app/actions/ai-actions"
+import { getFarmerData, addExpense, applyForLoan } from '@/ai/flows/farmer-flow'
 import { Skeleton } from "@/components/ui/skeleton"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
